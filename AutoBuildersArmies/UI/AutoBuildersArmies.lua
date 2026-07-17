@@ -312,30 +312,33 @@ local function MoveTo(pUnit, x, y)
 	-- out; warriors' one-tile step-outs always worked). So walk the path one
 	-- reachable leg per turn: intersect the path with GetReachableMovement and
 	-- move to the furthest path plot reachable NOW.
-	local okP, pathInfo = pcall(function()
-		return UnitManager.GetMoveToPathEx(pUnit, Map.GetPlotIndex(x, y));
-	end);
-	if okP and pathInfo ~= nil and pathInfo.plots ~= nil and table.count(pathInfo.plots) > 1 then
-		local okR, reach = pcall(function() return UnitManager.GetReachableMovement(pUnit); end);
-		local reachable = {};
-		if okR and reach ~= nil then
-			for _, idx in ipairs(reach) do reachable[idx] = true end
+	-- GREEDY-LEG FALLBACK (issue #13 v2): the path-based leg walk never engaged
+	-- -- pathInfo.plots' element format was an unverified assumption. This
+	-- version assumes NOTHING about paths: step to whichever reachable-now
+	-- plot is closest to the target. GetReachableMovement's index format is
+	-- proven (ScoutRetreat and step-out both use it live).
+	local okR, reach = pcall(function() return UnitManager.GetReachableMovement(pUnit); end);
+	if okR and reach ~= nil then
+		local ux, uy = pUnit:GetX(), pUnit:GetY();
+		local best, bestD = nil, Map.GetPlotDistance(ux, uy, x, y);
+		for _, idx in ipairs(reach) do
+			local p = Map.GetPlotByIndex(idx);
+			if p ~= nil and g_claims[idx] == nil and not (p:GetX() == ux and p:GetY() == uy) then
+				local d = Map.GetPlotDistance(p:GetX(), p:GetY(), x, y);
+				if d < bestD then bestD, best = d, p end
+			end
 		end
-		for i = table.count(pathInfo.plots), 2, -1 do
-			local legIdx = pathInfo.plots[i];
-			if reachable[legIdx] and g_claims[legIdx] == nil then
-				local legPlot = Map.GetPlotByIndex(legIdx);
-				local tLeg = {
-					[UnitOperationTypes.PARAM_X] = legPlot:GetX(),
-					[UnitOperationTypes.PARAM_Y] = legPlot:GetY(),
-				};
-				if CanStart(pUnit, UnitOperationTypes.MOVE_TO, tLeg) then
-					g_claims[legIdx] = pUnit:GetID();
-					IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tLeg);
-					Log("unit %d: far move refused; walking path leg to %d,%d",
-						pUnit:GetID(), legPlot:GetX(), legPlot:GetY());
-					return true;
-				end
+		if best ~= nil then
+			local tLeg = {
+				[UnitOperationTypes.PARAM_X] = best:GetX(),
+				[UnitOperationTypes.PARAM_Y] = best:GetY(),
+			};
+			if CanStart(pUnit, UnitOperationTypes.MOVE_TO, tLeg) then
+				g_claims[best:GetIndex()] = pUnit:GetID();
+				IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tLeg);
+				Log("unit %d: far move refused; greedy leg to %d,%d (toward %d,%d)",
+					pUnit:GetID(), best:GetX(), best:GetY(), x, y);
+				return true;
 			end
 		end
 	end
@@ -761,7 +764,8 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 				   and plot:GetImprovementType() == -1
 				   and plot:GetDistrictType() == -1
 				   and not plot:IsCity()
-				   and (g_plotSkip[plot:GetIndex()] == nil or g_plotSkip[plot:GetIndex()] <= nowTurn) then
+				   and (g_plotSkip[plot:GetIndex()] == nil or g_plotSkip[plot:GetIndex()] <= nowTurn)
+				   and g_claims[plot:GetIndex()] == nil then
 					local resIdx  = plot:GetResourceType();
 					local resRow  = (resIdx ~= -1) and GameInfo.Resources[resIdx] or nil;
 					local resName = (resRow ~= nil) and resRow.ResourceType or nil;
@@ -2005,7 +2009,8 @@ end
 -- not care about, and the ratios only fire when something is genuinely missing.
 local WANT_BUILDERS_PER_CITY = 1   -- a builder carries 3 charges; ~1 alive per city
 local WANT_MILITARY_PER_CITY = 2   -- garrison + a responder
-local MAX_SETTLERS_IN_FLIGHT = 2   -- more just queue up and get captured
+local MAX_SETTLERS_IN_FLIGHT = 1   -- Anthony's standard (#21): found the current
+                                   -- city before training the next settler
 local SETTLER_CITY_CAP       = 6   -- stop expanding around here; deepen instead
 
 -- Counts LIVE units AND what is already in the build queues. Counting the queues
@@ -2077,6 +2082,8 @@ local function CompositionVetoes(h, emp)
 		-- plenty, and past the city cap we should be deepening, not sprawling.
 		if emp.settlers >= MAX_SETTLERS_IN_FLIGHT then return true, "settler cap" end
 		if emp.cities   >= SETTLER_CITY_CAP       then return true, "city cap" end
+		-- Expansion standard (#21): no settling without escort coverage.
+		if emp.military < emp.cities + 1 then return true, "need army first" end
 	end
 	return false;
 end

@@ -1,0 +1,77 @@
+AutoBuildersArmies: [ABA] init: panel found
+AutoBuildersArmies: [ABA] init: context  size=1024,768 offset=0,0 hidden=false
+AutoBuildersArmies: [ABA] init: ABA_Root size=220,378 offset=798,190 hidden=false
+AutoBuildersArmies: [ABA] init: parent   size=0,0 offset=0,0 hidden=false
+AutoBuildersArmies: [ABA] init: screen   1024 x 768
+AutoBuildersArmies: [ABA] auto-research -> TECH_SAILING
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] settler 65536: founding city at 47,30
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] produce [LOC_CITY_NAME_ATHENS]: advisor empty (0 recs, 0 usable), own advisor -> rank 1
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_ATHENS] -> UNIT_SCOUT
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_ATHENS]: 0 builder(s) for 1 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] scout 196608 -> auto-explore
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_CRAFTSMANSHIP
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy slot 0 (SLOT_MILITARY) -> POLICY_DISCIPLINE
+AutoBuildersArmies: [ABA] policy slot 1 (SLOT_ECONOMIC) -> POLICY_GOD_KING
+AutoBuildersArmies: [ABA] policy slot 2 (SLOT_WILDCARD) -> POLICY_SURVEY
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_FILL_CIVIC_SLOT
+AutoBuildersArmies: [ABA] policy gate: slots=3 open=3 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 2: type=SLOT_WILDCARD current=-1
+AutoBuildersArmies: [ABA] policy slot 0 (SLOT_MILITARY) -> POLICY_DISCIPLINE
+AutoBuildersArmies: [ABA] policy slot 1 (SLOT_ECONOMIC) -> POLICY_GOD_KING
+AutoBuildersArmies: [ABA] policy slot 2 (SLOT_WILDCARD) -> POLICY_SURVEY

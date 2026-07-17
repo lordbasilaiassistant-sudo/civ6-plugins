@@ -1957,8 +1957,12 @@ local function AutomatePolicies(pPlayer)
 				for row in GameInfo.Policies() do
 					if not usedHash[row.PolicyHash or row.Hash] then
 						local h = row.PolicyHash or row.Hash;
-						local fits = (row.GovernmentSlotType == slotName)
-							or (slotName == "SLOT_WILDCARD");
+						-- EXACT fit only. Wildcard slots are excluded: the engine
+						-- rejects normal policies there via this path
+						-- (GovernmentScreen.lua:24 comment), and one rejected
+						-- entry dropped the ENTIRE batch -- Greece's wildcard
+						-- game never filled while wildcard-less games did.
+						local fits = (row.GovernmentSlotType == slotName);
 						if fits then
 							local okU, unlocked = pcall(function() return pCulture:IsPolicyUnlocked(h); end);
 							local okO, obsolete = pcall(function() return pCulture:IsPolicyObsolete(h); end);
@@ -1994,7 +1998,12 @@ local function AutomatePolicies(pPlayer)
 		end
 		return false;
 	end
-	pCulture:RequestPolicyChanges(clearList, addList);
+	-- One request PER SLOT: a single engine-rejected entry silently killed the
+	-- whole batched request (Greece live evidence -- picks logged, nothing
+	-- landed, every turn). Independent requests let valid slots land.
+	for slotIdx, hash in pairs(addList) do
+		pCulture:RequestPolicyChanges({}, { [slotIdx] = hash });
+	end
 	g_policyDone = true;
 	return true;
 end

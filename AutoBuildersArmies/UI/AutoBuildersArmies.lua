@@ -42,6 +42,16 @@ local g_promoted    = {}    -- [unitID]=true, promoted this turn. RequestCommand
                             -- async like everything else, so without this the same
                             -- unit gets promoted repeatedly against a stale
                             -- "promotion available" read.
+local g_retasks     = {}    -- [unitID]=count of re-tasks this turn. A unit whose
+                            -- operation completes with moves left gets its g_tasked
+                            -- cleared so it can act again (see
+                            -- OnUnitOperationSegmentComplete) -- capped, because an
+                            -- order the engine accepts-then-drops would otherwise
+                            -- re-issue forever within one turn.
+local g_pantheonDone  = false -- pantheon requested this turn (async; see g_envoyDone)
+local g_districtNoPlot = {}   -- ["cityID:hash"]=true, district had no legal plot this
+                              -- turn; excluded from recs so the city falls through to
+                              -- its next-best option instead of retrying every pass.
 local g_envoyDone   = false -- envoys dumped this turn. GetTokensToGive does not
                             -- update until the async op lands, so a second pass in
                             -- the same turn would spend tokens we no longer have.
@@ -1364,6 +1374,65 @@ local function AutomateEnvoys(pPlayer)
 	return sent > 0;
 end
 
+-- ---------------------------------------------------------------- pantheon ---
+--
+-- The pantheon choice blocks the turn exactly once per game, which makes it the
+-- most annoying blocker of all: rare enough to forget, absolute when it lands.
+--
+-- Verified API:
+--   LaunchBar.lua:138        pReligion:GetPantheon() < 0 and pReligion:CanCreatePantheon()
+--   PantheonChooser.lua:69-77  selectable = BELIEF_CLASS_PANTHEON and not
+--                              IsInSomePantheon(index) and not IsInSomeReligion(index)
+--   PantheonChooser.lua:129-132  PARAM_BELIEF_TYPE = GameInfo.Beliefs[i].Hash,
+--                              PARAM_INSERT_MODE = VALUE_EXCLUSIVE,
+--                              UI.RequestPlayerOperation(local, PlayerOperations.FOUND_PANTHEON, t)
+local function AutomatePantheon(pPlayer)
+	if g_pantheonDone then return false end
+
+	local okR, rel = pcall(function() return pPlayer:GetReligion(); end);
+	if not okR or rel == nil then return false end
+	local okP, pantheon = pcall(function() return rel:GetPantheon(); end);
+	local okC, canMake  = pcall(function() return rel:CanCreatePantheon(); end);
+	if not okP or not okC or pantheon == nil or pantheon >= 0 or canMake ~= true then return false end
+
+	local gameRel = Game.GetReligion();
+	if gameRel == nil then return false end
+
+	-- Generically strong pantheons first (production, growth, great people --
+	-- good in any game). Unlisted beliefs rank 99 and still get taken when the
+	-- list is exhausted: ANY pantheon beats a blocked turn.
+	local PREF = {
+		BELIEF_GOD_OF_THE_FORGE       = 1,
+		BELIEF_FERTILITY_RITES        = 2,
+		BELIEF_DIVINE_SPARK           = 3,
+		BELIEF_RELIGIOUS_SETTLEMENTS  = 4,
+		BELIEF_GOD_OF_CRAFTSMEN       = 5,
+		BELIEF_MONUMENT_TO_THE_GODS   = 6,
+	};
+
+	local best, bestRank = nil, nil;
+	for kBelief in GameInfo.Beliefs() do
+		if kBelief.BeliefClassType == "BELIEF_CLASS_PANTHEON" then
+			local okT, taken = pcall(function()
+				return gameRel:IsInSomePantheon(kBelief.Index) or gameRel:IsInSomeReligion(kBelief.Index);
+			end);
+			if okT and taken ~= true then
+				local rank = PREF[kBelief.BeliefType] or 99;
+				if bestRank == nil or rank < bestRank then bestRank, best = rank, kBelief end
+			end
+		end
+	end
+	if best == nil then return false end
+
+	local tParameters = {};
+	tParameters[PlayerOperations.PARAM_BELIEF_TYPE] = best.Hash;
+	tParameters[PlayerOperations.PARAM_INSERT_MODE] = PlayerOperations.VALUE_EXCLUSIVE;
+	UI.RequestPlayerOperation(Game.GetLocalPlayer(), PlayerOperations.FOUND_PANTHEON, tParameters);
+	g_pantheonDone = true;
+	Log("pantheon -> %s (rank %d)", tostring(best.BeliefType), bestRank);
+	return true;
+end
+
 -- ------------------------------------------------- city production ----------
 --
 -- Same philosophy as research: the city's own AI already knows what it wants
@@ -1467,6 +1536,53 @@ local function CompositionVetoes(h, emp)
 		if emp.cities   >= SETTLER_CITY_CAP       then return true, "city cap" end
 	end
 	return false;
+end
+
+-- ------------------------------------------------- district placement -------
+--
+-- Districts are the single biggest empire-strength lever, and until now the mod
+-- never built one -- a hard economic cap. What made them scary is the plot
+-- choice: a badly placed district wastes that tile for the whole game. So the
+-- placement is exactly the game's own: GetOperationTargets returns the plots
+-- the placement UI would light up (AdjacencyBonusSupport.lua:290), and each is
+-- scored with plot:GetAdjacencyYield -- the same call that draws the "+2" icons
+-- during manual placement (DistrictPlotIconManager.lua:142, which also proves
+-- the district arg is the INDEX, not the hash).
+--
+-- Returns the best plot for this district in this city, or nil if none is legal.
+local function BestDistrictPlot(pCity, districtHash)
+	local kType = GameInfo.Types[districtHash];
+	local dRow  = (kType ~= nil) and GameInfo.Districts[kType.Type] or nil;
+	if dRow == nil then return nil end
+
+	local tParameters = { [CityOperationTypes.PARAM_DISTRICT_TYPE] = districtHash };
+	local ok, tResults = pcall(function()
+		return CityManager.GetOperationTargets(pCity, CityOperationTypes.BUILD, tParameters);
+	end);
+	if not ok or tResults == nil then return nil end
+	local kPlots = tResults[CityOperationResults.PLOTS];
+	if kPlots == nil or table.count(kPlots) == 0 then return nil end
+
+	local eLocal, cityID = pCity:GetOwner(), pCity:GetID();
+	local best, bestScore = nil, -1;
+	for _, plotId in ipairs(kPlots) do
+		local plot = Map.GetPlotByIndex(plotId);
+		if plot ~= nil then
+			local score = 0;
+			for yRow in GameInfo.Yields() do
+				local okY, y = pcall(function()
+					return plot:GetAdjacencyYield(eLocal, cityID, dRow.Index, yRow.Index);
+				end);
+				if okY and y ~= nil then score = score + y end
+			end
+			if score > bestScore then bestScore, best = score, plot end
+		end
+	end
+	if best ~= nil then
+		Log("district plot for %s: %d,%d (adjacency %d, %d candidates)",
+			tostring(kType.Type), best:GetX(), best:GetY(), bestScore, table.count(kPlots));
+	end
+	return best;
 end
 
 local function AutomateProduction(pPlayer, threats)
@@ -1579,7 +1695,9 @@ local function AutomateProduction(pPlayer, threats)
 							Log("produce [%s]: vetoing advisor's %s (%s)",
 								tostring(pCity:GetName()),
 								(kType ~= nil and kType.Type) or tostring(h), tostring(vetoWhy));
-						elseif not isWonder and (kind == "KIND_UNIT" or kind == "KIND_BUILDING" or kind == "KIND_PROJECT")
+						elseif not isWonder
+						   and (kind == "KIND_UNIT" or kind == "KIND_BUILDING" or kind == "KIND_PROJECT"
+						        or (kind == "KIND_DISTRICT" and not g_districtNoPlot[cityID .. ":" .. tostring(h)]))
 						   and CanCityProduce(h) then
 							nUsable = nUsable + 1;
 							local s = kItem.BuildItemScore or 0;
@@ -1661,6 +1779,26 @@ local function AutomateProduction(pPlayer, threats)
 							tParameters[CityOperationTypes.PARAM_UNIT_TYPE] = bestHash;
 						elseif bestKind == "KIND_BUILDING" then
 							tParameters[CityOperationTypes.PARAM_BUILDING_TYPE] = bestHash;
+						elseif bestKind == "KIND_DISTRICT" then
+							-- A district order without a plot is silently dropped by
+							-- the engine, so resolve the plot NOW or walk away. The
+							-- param shape is the game's own placement confirm:
+							-- StrategicView_MapPlacement.lua:204-207.
+							local plot = BestDistrictPlot(pCity, bestHash);
+							if plot ~= nil then
+								tParameters[CityOperationTypes.PARAM_DISTRICT_TYPE] = bestHash;
+								tParameters[CityOperationTypes.PARAM_X] = plot:GetX();
+								tParameters[CityOperationTypes.PARAM_Y] = plot:GetY();
+							else
+								-- No legal plot this turn: remember that so the next
+								-- pass picks the advisor's next-best item instead of
+								-- retrying this district forever.
+								g_districtNoPlot[cityID .. ":" .. tostring(bestHash)] = true;
+								local kT = GameInfo.Types[bestHash];
+								Log("produce [%s]: district %s has NO legal plot -- excluded this turn",
+									tostring(pCity:GetName()), (kT ~= nil and kT.Type) or tostring(bestHash));
+								bestHash = nil;
+							end
 						elseif bestKind == "KIND_PROJECT" then
 							if CityOperationTypes.PARAM_PROJECT_TYPE == nil then bestHash = nil
 							else tParameters[CityOperationTypes.PARAM_PROJECT_TYPE] = bestHash end
@@ -1782,6 +1920,7 @@ local function RunAutomation()
 		AutomateResearch(pPlayer);
 		AutomateCivics(pPlayer);
 		AutomateEnvoys(pPlayer);
+		AutomatePantheon(pPlayer);
 	end
 	if g_produce then
 		AutomateProduction(pPlayer, threats);
@@ -1924,15 +2063,51 @@ local function OnPublishComplete()
 end
 
 local function OnLocalPlayerTurnBegin()
-	g_tasked      = {};
-	g_cityOrdered = {};
-	g_promoted    = {};
-	g_envoyDone   = false;
+	g_tasked         = {};
+	g_cityOrdered    = {};
+	g_promoted       = {};
+	g_retasks        = {};
+	g_districtNoPlot = {};
+	g_envoyDone      = false;
+	g_pantheonDone   = false;
 	RequestPass();
 end
 
 local function OnUnitDone(player)
 	if player == Game.GetLocalPlayer() then RequestPass(); end
+end
+
+-- THE "builder moved and froze" FIX (turn 5, live). One-order-per-unit-per-turn
+-- deadlocks when the order finishes EARLY: builder moves one tile, has 1 move
+-- left, game blocks the turn on UNIT HAS MOVES -- but the unit is already in
+-- g_tasked, the turn cannot end, so TurnBegin never clears the debounce. Frozen.
+--
+-- The game's own end-turn panel listens to exactly these two events to update
+-- the "units have moves" state (ActionPanel.lua:1350-1351,827-843), so they are
+-- precisely "a unit's order resolved; re-evaluate". We clear that unit's
+-- debounce and re-sweep: a unit with moves left gets its next order (builder
+-- moves AND builds in one turn now), a unit without reads as not-ready and is
+-- skipped. Capped per unit per turn because an order the engine accepts and
+-- then drops would otherwise re-issue forever within the turn.
+local MAX_RETASKS = 4;
+
+local function OnUnitOpResolved(player, unitID, hCommand, iData1)
+	if player ~= Game.GetLocalPlayer() then return end
+	if g_tasked[unitID] then
+		local n = (g_retasks[unitID] or 0) + 1;
+		if n > MAX_RETASKS then
+			if n == MAX_RETASKS + 1 then
+				g_retasks[unitID] = n;
+				Log("unit %d: re-task cap hit (%d) -- engine keeps resolving without progress, leaving tasked", unitID, MAX_RETASKS);
+			end
+			return;
+		end
+		g_retasks[unitID] = n;
+		g_tasked[unitID]  = nil;
+	end
+	-- Always re-sweep: even an untasked unit resolving an op (a multi-turn move
+	-- arriving, engine-driven exploration ending) means someone may now be idle.
+	RequestPass();
 end
 
 -- A unit trained mid-turn is idle the instant it appears. Without this it just
@@ -2134,7 +2309,11 @@ function Initialize()
 	Events.LoadGameViewStateDone.Add(       Safe("LoadPrefs",        LoadPrefs));
 	Events.LocalPlayerTurnBegin.Add(        Safe("TurnBegin",        OnLocalPlayerTurnBegin));
 	Events.GameCoreEventPublishComplete.Add(Safe("PublishComplete",  OnPublishComplete));
-	Events.UnitOperationsCleared.Add(       Safe("UnitOpsCleared",   OnUnitDone));
+	-- Both resolution events go through the UNTASKING handler, not a bare
+	-- re-pass: re-sweeping while the unit is still in g_tasked just skips it
+	-- again -- that was the frozen-builder bug in one line.
+	Events.UnitOperationsCleared.Add(       Safe("UnitOpsCleared",   OnUnitOpResolved));
+	Events.UnitOperationSegmentComplete.Add(Safe("UnitOpSegment",    OnUnitOpResolved));
 	Events.UnitMoveComplete.Add(            Safe("UnitMoveComplete", OnUnitDone));
 	Events.UnitAddedToMap.Add(              Safe("UnitAddedToMap",   OnUnitAddedToMap));
 	Events.CitySelectionChanged.Add(        Safe("CitySelChanged",   OnCitySelectionChanged));

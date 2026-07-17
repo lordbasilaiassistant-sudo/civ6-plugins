@@ -139,7 +139,9 @@ local function CanStart(pUnit, op, tParams)
 	else
 		ok, res = pcall(function() return UnitManager.CanStartOperation(pUnit, op, nil, false, false); end);
 	end
-	return ok and res == true;
+	-- Truthiness, not `== true`: the game's own callers do `if (CanStartOperation(...))`,
+	-- so mirror that rather than betting the whole mod on the return being a strict boolean.
+	return ok and not not res;
 end
 
 -- UnitOperationTypes is filled from the database, so resolve defensively rather
@@ -626,8 +628,9 @@ local function AutomateSettler(pUnit, pPlayer, threats)
 		end
 		if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
 			UnitManager.RequestOperation(pUnit, UnitOperationTypes.SKIP_TURN);
+			return "hold";
 		end
-		return "hold";
+		return nil;   -- nothing issued -> caller's catch-all takes it
 	end
 
 	-- 1) A committed site is only re-examined for danger, never for "a slightly
@@ -1120,6 +1123,18 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	--     action. A lone unit walks to the rally point and waits for the others
 	--     rather than arriving by itself and dying by itself.
 	if army ~= nil and #army > 0 and not IsCohesive(army, x, y) then
+		-- Never rally AWAY from an enemy that is already on top of us. The wake
+		-- branch exists precisely to make lone garrisons defend; sending them
+		-- marching to the army's centre of mass would un-fix that bug. Contact
+		-- range -> hold here, fight with the attack logic above next pass.
+		local dHere = NearestThreatDist(threats, x, y);
+		if dHere ~= nil and dHere <= 2 then
+			if CanStart(pUnit, UnitOperationTypes.FORTIFY) then
+				UnitManager.RequestOperation(pUnit, UnitOperationTypes.FORTIFY);
+				return "stand";
+			end
+			return nil;
+		end
 		local rally = ArmyRally(army);
 		if rally ~= nil and rally.id ~= pUnit:GetID() then
 			if MoveTo(pUnit, rally.x, rally.y) then
@@ -1323,7 +1338,12 @@ local function AutomateEnvoys(pPlayer)
 				end
 
 				if bestScore == nil or score > bestScore then
-					bestScore, best, bestName = score, mid, pMinor:GetName();
+					-- Player objects have NO GetName() (grep-verified: zero hits in
+					-- the UI tree). Names live on PlayerConfigurations
+					-- (CityStates.lua:213).
+					local cfg = PlayerConfigurations[mid];
+					bestScore, best = score, mid;
+					bestName = (cfg ~= nil) and cfg:GetCivilizationShortDescription() or tostring(mid);
 				end
 			end
 		end
@@ -1815,15 +1835,18 @@ local function RunAutomation()
 						r = TryAutoExplore(pUnit) and "explore" or nil;
 						if r == nil then
 							-- Auto-explore refused: the engine will not automate a unit
-							-- in enemy contact. THIS is what stranded the scout. Fight
-							-- if there is something worth hitting, otherwise break
-							-- contact and try exploring again next turn. Scouts pass a
-							-- nil army on purpose -- a scout is not part of the battle
-							-- line and must never be held back waiting to group up.
-							if g_armies then
+							-- in enemy contact. THIS is what stranded the scout. A scout
+							-- is not a soldier: break contact FIRST so exploring works
+							-- again next turn, and only fight if there is genuinely no
+							-- way out. (Combat before retreat would hand the scout to
+							-- AdvanceToward, which marches it AT the enemy -- suicide
+							-- for 10 strength.) Army is nil on purpose: scouts are not
+							-- part of the battle line and never wait to group up.
+							if ScoutRetreat(pUnit, pPlayer, threats) then
+								r = "withdraw";
+							elseif g_armies then
 								r = AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, nil);
 							end
-							if r == nil and ScoutRetreat(pUnit, pPlayer, threats) then r = "withdraw" end
 						end
 					end
 					if r ~= nil then nA = nA + 1 end

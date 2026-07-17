@@ -49,6 +49,7 @@ local g_retasks     = {}    -- [unitID]=count of re-tasks this turn. A unit whos
                             -- order the engine accepts-then-drops would otherwise
                             -- re-issue forever within one turn.
 local g_pantheonDone  = false -- pantheon requested this turn (async; see g_envoyDone)
+local g_religionDone  = false -- religion founding requested this turn (async)
 local g_inflight    = {}    -- [unitID]=true, an order is ISSUED but not yet resolved.
                             -- The keystone debounce (issue #3): every Request* is
                             -- async, and a queued SKIP/FORTIFY/FOUND_CITY has no
@@ -1598,6 +1599,82 @@ local function AutomatePantheon(pPlayer)
 	return true;
 end
 
+-- ---------------------------------------------------------------- religion ---
+--
+-- Phase 2 of great-prophet automation (issue #7): after the prophet activates,
+-- the player is in "choose religion" state and END TURN blocks on it. The
+-- exact state gate is the game's own (ReligionScreen.lua:311-329):
+--   pantheon exists AND GetNumBeliefsEarned() > 0 AND GetReligionTypeCreated() < 0
+-- Available religions: GameInfo.Religions() where Pantheon == false and not
+-- Game.GetReligion():HasBeenFounded(index) (ReligionScreen.lua:643-644).
+-- Ops verified at ReligionScreen.lua:903-919 (FOUND_RELIGION + ADD_BELIEF).
+local function AutomateReligion(pPlayer)
+	if g_religionDone then return false end
+
+	local okR, rel = pcall(function() return pPlayer:GetReligion(); end);
+	if not okR or rel == nil then return false end
+	local okP, pantheon = pcall(function() return rel:GetPantheon(); end);
+	local okT, created  = pcall(function() return rel:GetReligionTypeCreated(); end);
+	local okE, earned   = pcall(function() return rel:GetNumBeliefsEarned(); end);
+	if not (okP and okT and okE) then return false end
+	if pantheon == nil or pantheon < 0 then return false end
+	if created == nil or created >= 0 then return false end
+	if earned == nil or earned <= 0 then return false end
+
+	local gameRel = Game.GetReligion();
+	if gameRel == nil then return false end
+
+	-- Any unfounded standard religion; skip custom-name ones (they need a text
+	-- param a rules engine has no business inventing).
+	local pick = nil;
+	for row in GameInfo.Religions() do
+		local okF, founded = pcall(function() return gameRel:HasBeenFounded(row.Index); end);
+		if row.Pantheon == false and okF and founded ~= true
+		   and not (row.RequiresCustomName == true or row.RequiresCustomName == 1) then
+			pick = row;
+			break;
+		end
+	end
+	if pick == nil then return false end
+
+	local tParameters = {};
+	tParameters[PlayerOperations.PARAM_INSERT_MODE]  = PlayerOperations.VALUE_EXCLUSIVE;
+	tParameters[PlayerOperations.PARAM_RELIGION_TYPE] = pick.Hash;
+	UI.RequestPlayerOperation(Game.GetLocalPlayer(), PlayerOperations.FOUND_RELIGION, tParameters);
+	Log("FOUNDING RELIGION -> %s", tostring(pick.ReligionType));
+
+	-- Beliefs: one per earned slot. Follower first, then founder, then anything
+	-- non-pantheon still free -- same order the chooser walks. A wrong-class
+	-- request is dropped by the engine; the next turn's pass retries with the
+	-- flag reset, so a partial fill self-completes.
+	local CLASS_ORDER = { BELIEF_CLASS_FOLLOWER = 1, BELIEF_CLASS_FOUNDER = 2 };
+	local sent, sentClass = 0, {};
+	for pass = 1, 3 do
+		for kBelief in GameInfo.Beliefs() do
+			if sent >= earned then break end
+			local rank = CLASS_ORDER[kBelief.BeliefClassType] or 3;
+			if rank == pass and kBelief.BeliefClassType ~= "BELIEF_CLASS_PANTHEON"
+			   and not sentClass[kBelief.BeliefClassType] then
+				local okU, used = pcall(function()
+					return gameRel:IsInSomeReligion(kBelief.Index) or gameRel:IsInSomePantheon(kBelief.Index);
+				end);
+				if okU and used ~= true then
+					local tB = {};
+					tB[PlayerOperations.PARAM_BELIEF_TYPE]  = kBelief.Hash;
+					tB[PlayerOperations.PARAM_INSERT_MODE]  = PlayerOperations.VALUE_EXCLUSIVE;
+					UI.RequestPlayerOperation(Game.GetLocalPlayer(), PlayerOperations.ADD_BELIEF, tB);
+					Log("religion belief -> %s (%s)", tostring(kBelief.BeliefType), tostring(kBelief.BeliefClassType));
+					sent = sent + 1;
+					sentClass[kBelief.BeliefClassType] = true;
+				end
+			end
+		end
+	end
+
+	g_religionDone = true;
+	return true;
+end
+
 -- ------------------------------------------------- city production ----------
 --
 -- Same philosophy as research: the city's own AI already knows what it wants
@@ -2091,6 +2168,7 @@ local function RunAutomation()
 		AutomateCivics(pPlayer);
 		AutomateEnvoys(pPlayer);
 		AutomatePantheon(pPlayer);
+		AutomateReligion(pPlayer);
 	end
 	if g_produce then
 		AutomateProduction(pPlayer, threats);
@@ -2312,6 +2390,7 @@ local function OnLocalPlayerTurnBegin()
 	g_woken          = {};
 	g_envoyDone      = false;
 	g_pantheonDone   = false;
+	g_religionDone   = false;
 	g_builderIdleLastTurn = g_builderIdleThisTurn;
 	g_builderIdleThisTurn = false;
 	local e = Game.GetLocalPlayer();

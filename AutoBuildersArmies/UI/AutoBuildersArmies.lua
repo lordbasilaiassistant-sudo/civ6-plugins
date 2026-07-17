@@ -2255,6 +2255,53 @@ local function OnPublishComplete()
 	RunAutomation();
 end
 
+-- ------------------------------------------------------------- telemetry ----
+--
+-- The learning loop's state channel (issue #8). One [ABA-TEL] line per turn:
+-- print() is the sandbox's only door to the outside (no file/net IO), and we
+-- already read Lua.log externally. The REWARD side is free -- the game grades
+-- itself (GetScore, plus the per-turn AI_*.csv files the engine writes) -- so
+-- this line only needs the STATE the CSVs don't carry. Single line, k=v pairs,
+-- trivially parseable. Every getter pcall-guarded and grep-verified:
+-- GetScore ARXManager.lua:43, yields TopPanel.lua:107-147, population
+-- CitySupport.lua, GetNumTechsResearched ARXManager.lua:142, Game.GetEras
+-- (nil-guarded, PortraitSupport.lua:26).
+local function EmitTelemetry(pPlayer)
+	local function N(f, d) local ok, v = pcall(f); return (ok and v ~= nil) and v or (d or 0) end
+	local turn  = N(function() return Game.GetCurrentGameTurn() end);
+	local score = N(function() return pPlayer:GetScore() end);
+	local sci   = N(function() return pPlayer:GetTechs():GetScienceYield() end);
+	local cul   = N(function() return pPlayer:GetCulture():GetCultureYield() end);
+	local gpt   = N(function() return pPlayer:GetTreasury():GetGoldYield() - pPlayer:GetTreasury():GetTotalMaintenance() end);
+	local gold  = N(function() return math.floor(pPlayer:GetTreasury():GetGoldBalance()) end);
+	local fpt   = N(function() return pPlayer:GetReligion():GetFaithYield() end);
+	local nTech = N(function() return pPlayer:GetStats():GetNumTechsResearched() end);
+	local era   = N(function() return Game.GetEras():GetCurrentEra() end, -1);
+
+	local nCities, pop = 0, 0;
+	local okC, cities = pcall(function() return pPlayer:GetCities() end);
+	if okC and cities ~= nil then
+		for _, c in cities:Members() do
+			nCities = nCities + 1;
+			pop = pop + (N(function() return c:GetPopulation() end));
+		end
+	end
+	local nUnits, nMil = 0, 0;
+	local okU, units = pcall(function() return pPlayer:GetUnits() end);
+	if okU and units ~= nil then
+		for _, u in units:Members() do
+			if not u:IsDead() then
+				nUnits = nUnits + 1;
+				if IsCombatUnit(u) then nMil = nMil + 1 end
+			end
+		end
+	end
+
+	print(string.format(
+		"[ABA-TEL] turn=%d era=%d score=%d cities=%d pop=%d units=%d mil=%d sci=%.1f cul=%.1f gpt=%.1f gold=%d fpt=%.1f techs=%d",
+		turn, era, score, nCities, pop, nUnits, nMil, sci, cul, gpt, gold, fpt, nTech));
+end
+
 local function OnLocalPlayerTurnBegin()
 	g_tasked         = {};
 	g_cityOrdered    = {};
@@ -2267,6 +2314,10 @@ local function OnLocalPlayerTurnBegin()
 	g_pantheonDone   = false;
 	g_builderIdleLastTurn = g_builderIdleThisTurn;
 	g_builderIdleThisTurn = false;
+	local e = Game.GetLocalPlayer();
+	if e ~= nil and e ~= -1 and Players[e] ~= nil then
+		pcall(EmitTelemetry, Players[e]);
+	end
 	RequestPass();
 end
 

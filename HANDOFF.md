@@ -1,4 +1,15 @@
-# Civ6 AutoBuildersArmies — Session Handoff (2026-07-17)
+# Civ6 AutoBuildersArmies — Session Handoff (2026-07-17, updated same day)
+
+> **WORKFLOW: issues-first.** Live bugs get GitHub issues DURING play (symptom / log evidence /
+> root cause / fix design with file:line citations / acceptance criteria), batch-fixed after,
+> labeled `fix-landed`, closed only when a later session's Lua.log meets the acceptance criteria.
+> Issue list: https://github.com/lordbasilaiassistant-sudo/civ6-plugins/issues
+> Key architecture since the first writing: IssueOp/IssueCmd wrappers (ALL unit orders go through
+> them — they set the per-unit in-flight flag; issuing via UnitManager directly reintroduces the
+> async race, issue #3), EnsureOrdered catch-all (no unit leaves the sweep unordered), composition
+> guardrails, district placement, pantheon/envoys/traders/great-people automation.
+> Learning loop (#8): game self-grades (score, victory progress, Logs/*.csv per turn); [ABA-TEL]
+> print-stream exports state; trainer lives OUTSIDE the game and bakes parameters back into Lua.
 
 Goal: **fully autonomous Civ6 gameplay** — Anthony watches, optionally does diplomacy/trades;
 everything else runs itself. One mod, verified live over ~8 restarts tonight.

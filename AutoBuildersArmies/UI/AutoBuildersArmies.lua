@@ -283,6 +283,19 @@ local function MoveTo(pUnit, x, y)
 		IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tParams);
 		return true;
 	end
+	-- Retry WITHOUT the modifiers key (issue #13): every civilian MOVE_TO was
+	-- refused on the fjord-heavy Norway map while warriors moved fine -- the
+	-- MODIFIERS=NONE param is the prime suspect for refusing embark legs.
+	-- Dropping a param cannot invent API; the engine defaults it.
+	local tBare = {
+		[UnitOperationTypes.PARAM_X] = x,
+		[UnitOperationTypes.PARAM_Y] = y,
+	};
+	if CanStart(pUnit, UnitOperationTypes.MOVE_TO, tBare) then
+		IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tBare);
+		Log("unit %d: MOVE_TO %d,%d accepted only without modifiers", pUnit:GetID(), x, y);
+		return true;
+	end
 	return false;
 end
 
@@ -1476,6 +1489,13 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 		IssueOp(pUnit,UnitOperationTypes.SKIP_TURN);
 		return "hold";
 	end
+	-- Issue #6 diagnostics: name WHY the combat brain declined, so army
+	-- passivity is diagnosable from the log instead of guessed at.
+	local dT = NearestThreatDist(threats, x, y);
+	Log("combat %d declined: hp=%d str=%d threat=%s cohesive=%s target=%s advance=%s",
+		pUnit:GetID(), hp, myStr, tostring(dT),
+		tostring(army == nil or IsCohesive(army, x, y)),
+		tostring(g_target ~= nil), tostring(g_advance));
 	return nil;
 end
 
@@ -2640,6 +2660,20 @@ local function OnEndTurnBlockingChanged(ePrev, eNew)
 	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_UNIT_NEEDS_ORDERS
 	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_STACKED_UNITS then
 		g_tasked = {};   -- someone we "handled" is not handled; look again at everyone
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_PRODUCTION then
+		-- Mirror of the units fix (issue #18, Nidaros t77 freeze): an
+		-- accepted-then-dropped city order left g_cityOrdered set for the
+		-- whole turn and the re-pass skipped the idle city.
+		g_cityOrdered = {};
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_GIVE_INFLUENCE_TOKEN then
+		g_envoyDone = false;    -- tokens arrived after this turn's envoy pass
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_PANTHEON then
+		g_pantheonDone = false;
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_RELIGION
+	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_BELIEF then
+		g_religionDone = false;
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_FILL_CIVIC_SLOT then
+		g_policyDone = false;
 	end
 	RequestPass();
 end

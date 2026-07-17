@@ -59,6 +59,8 @@ local g_inflight    = {}    -- [unitID]=true, an order is ISSUED but not yet res
                             -- re-enters it, finds every CanStart refused (an op IS
                             -- queued), and reports a spurious STUCK. Set by
                             -- IssueOp/IssueCmd, cleared on resolution + turn begin.
+local g_claims      = {}    -- [plotIndex]=unitID, movement destinations claimed this
+                            -- turn -- two units electing one tile = second refused.
 local g_woken       = {}    -- [unitID]=true, woken by the fortified-wake branch this
                             -- turn. That branch bypasses the idle filter by design,
                             -- so it needs its own once-per-turn debounce (a warrior
@@ -279,7 +281,15 @@ local function MoveTo(pUnit, x, y)
 		[UnitOperationTypes.PARAM_Y] = y,
 		[UnitOperationTypes.PARAM_MODIFIERS] = UnitOperationMoveModifiers.NONE,
 	};
+	-- Destination claims (issue #13 root, verified on land map): two units
+	-- electing the same tile means the second MOVE_TO is refused (occupied or
+	-- about to be). One claim per destination per turn; reset at TurnBegin.
+	local claimKey = Map.GetPlotIndex(x, y);
+	if g_claims[claimKey] ~= nil and g_claims[claimKey] ~= pUnit:GetID() then
+		return false;
+	end
 	if CanStart(pUnit, UnitOperationTypes.MOVE_TO, tParams) then
+		g_claims[claimKey] = pUnit:GetID();
 		IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tParams);
 		return true;
 	end
@@ -2612,6 +2622,7 @@ local function OnLocalPlayerTurnBegin()
 	g_districtNoPlot = {};
 	g_inflight       = {};
 	g_woken          = {};
+	g_claims         = {};
 	g_refused        = {};
 	g_envoyDone      = false;
 	g_pantheonDone   = false;

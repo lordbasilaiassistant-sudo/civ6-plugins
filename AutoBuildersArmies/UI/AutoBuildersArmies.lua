@@ -1453,11 +1453,50 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 		end
 	end
 
-	-- B) Wounded and safe -> heal (fortify until healed).
-	if hp < HEAL_HP_THRESHOLD and StrongestAdjacentEnemy(x, y, eLocalPlayer, pDiplo, pVis) == 0 then
-		if CanStart(pUnit, UnitOperationTypes.HEAL) then
-			IssueOp(pUnit,UnitOperationTypes.HEAL);
-			return "heal";
+	-- B) Wounded and safe -> heal (fortify until healed). Under fire -> RUN:
+	-- an hp=1 warrior sat adjacent to an enemy with no escape branch (live,
+	-- India session) because heal required a clear tile. ScoutRetreat's
+	-- step-away logic works for any land unit.
+	if hp < HEAL_HP_THRESHOLD then
+		if StrongestAdjacentEnemy(x, y, eLocalPlayer, pDiplo, pVis) == 0 then
+			if CanStart(pUnit, UnitOperationTypes.HEAL) then
+				IssueOp(pUnit,UnitOperationTypes.HEAL);
+				return "heal";
+			end
+		elseif ScoutRetreat(pUnit, Players[eLocalPlayer], threats) then
+			return "retreat";
+		end
+	end
+
+	-- B2) ESCORT (issue #19, Anthony's direction): a settler without a shadow
+	-- is a barbarian gift. If an own settler is nearby and no other army
+	-- member is closer, shadow it -- this outranks advancing on enemies.
+	local pP = Players[eLocalPlayer];
+	local okS, units = pcall(function() return pP:GetUnits(); end);
+	if okS and units ~= nil then
+		for _, u in units:Members() do
+			if not u:IsDead() and IsSettler(u) then
+				local dMe = Map.GetPlotDistance(x, y, u:GetX(), u:GetY());
+				if dMe <= 6 then
+					local closest = true;
+					if army ~= nil then
+						for _, a in ipairs(army) do
+							if a.id ~= pUnit:GetID()
+							   and Map.GetPlotDistance(a.x, a.y, u:GetX(), u:GetY()) < dMe then
+								closest = false; break;
+							end
+						end
+					end
+					if closest and dMe > 1 then
+						if MoveTo(pUnit, u:GetX(), u:GetY()) then
+							Log("unit %d: escorting settler %d", pUnit:GetID(), u:GetID());
+							return "escort";
+						end
+					elseif closest and dMe <= 1 then
+						break;   -- already adjacent; fall through to fight/hold
+					end
+				end
+			end
 		end
 	end
 

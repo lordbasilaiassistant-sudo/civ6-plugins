@@ -2452,7 +2452,16 @@ local function RunAutomation()
 					if r ~= nil then nA = nA + 1 end
 				elseif g_armies and IsCombatUnit(pUnit) then
 					kind = "army";
-					r = AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, army);
+					-- Two dropped orders this turn = the engine is refusing this
+					-- unit's plan (ZOC advance, contested tile...). A third
+					-- identical attempt was never going to work -- observed as
+					-- 4 warriors churning to the cap every turn. Rest instead;
+					-- fresh judgement next turn.
+					if (g_retasks[id] or 0) >= 2 then
+						r = nil;
+					else
+						r = AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, army);
+					end
 					if r ~= nil then nA = nA + 1 end
 				else
 					-- Support, religious, great people, anything we do not model yet.

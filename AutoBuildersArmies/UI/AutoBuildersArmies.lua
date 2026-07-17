@@ -797,6 +797,11 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 		if a.score ~= b.score then return a.score > b.score end
 		return a.dist < b.dist;
 	end);
+	if #candidates == 0 then
+		-- Rule #5 (Anthony: "better listening"): a whole session ran with zero
+		-- scan lines because an empty candidate list returned nil silently.
+		Log("builder %d: fallback scan 0 candidates -- all filtered (owned/water/improved/district/blacklist/claims/resource-tech)", pUnit:GetID());
+	end
 	for _, c in ipairs(candidates) do
 		if c.plot:GetX() == ux and c.plot:GetY() == uy then
 			return c.plot;   -- already standing on it; no path needed
@@ -1531,6 +1536,7 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 				IssueOp(pUnit,UnitOperationTypes.FORTIFY);
 				return "stand";
 			end
+			Log("combat %d declined AT COHESION GATE: threat<=2, skip+fortify both refused", pUnit:GetID());
 			return nil;
 		end
 		local rally = ArmyRally(army);
@@ -1956,9 +1962,12 @@ local function AutomatePolicies(pPlayer)
 						if fits then
 							local okU, unlocked = pcall(function() return pCulture:IsPolicyUnlocked(h); end);
 							local okO, obsolete = pcall(function() return pCulture:IsPolicyObsolete(h); end);
-							local okA, active   = pcall(function() return pCulture:IsPolicyActive(row.Index); end);
-							if okU and unlocked == true and okO and obsolete ~= true
-							   and okA and active ~= true then
+							-- IsPolicyActive dropped from the filter: its arg type
+							-- (index vs hash) is unverified and a wrong type could
+							-- read everything as active -> nAdd=0 (Anthony's empty-
+							-- slot report). usedHash dedupes within the request;
+							-- true duplicates get engine-rejected harmlessly.
+							if okU and unlocked == true and okO and obsolete ~= true then
 								addList[i] = h;
 								usedHash[h] = true;
 								nAdd = nAdd + 1;
@@ -1972,7 +1981,19 @@ local function AutomatePolicies(pPlayer)
 		end
 	end
 
-	if nAdd == 0 then return false end
+	if nAdd == 0 then
+		-- Anthony's report: empty slots left unfilled with no explanation.
+		-- Distinguish "nothing unlocked yet" from a real eligibility bug.
+		local hadEmpty = false;
+		for i = 0, nSlots - 1 do
+			local okS, sp = pcall(function() return pCulture:GetSlotPolicy(i); end);
+			if okS and (sp == nil or sp == -1) then hadEmpty = true; break end
+		end
+		if hadEmpty then
+			Log("policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate");
+		end
+		return false;
+	end
 	pCulture:RequestPolicyChanges(clearList, addList);
 	g_policyDone = true;
 	return true;

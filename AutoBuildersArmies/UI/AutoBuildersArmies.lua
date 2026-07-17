@@ -65,6 +65,9 @@ local g_woken       = {}    -- [unitID]=true, woken by the fortified-wake branch
                             -- turn. That branch bypasses the idle filter by design,
                             -- so it needs its own once-per-turn debounce (a warrior
                             -- was re-woken 21 times in one session without it).
+local g_builderShortTurns = 0        -- consecutive turns of builder shortage (#5:
+                                     -- hire only when it persists, not on the turn
+                                     -- a builder just died).
 local g_builderIdleLastTurn = false  -- a builder with charges found no work last turn.
 local g_builderIdleThisTurn = false  -- Composition must not queue ANOTHER builder while
                                      -- one is already unemployed (issue #5: builders
@@ -2060,10 +2063,18 @@ end
 local function CompositionWant(emp)
 	if emp.cities < 1 then return nil end
 	-- Do not hire while someone already on payroll has nothing to do (issue #5):
-	-- an unemployed builder means the bottleneck is WORK, not headcount.
+	-- an unemployed builder means the bottleneck is WORK, not headcount. And
+	-- require the shortage to PERSIST two consecutive turns -- captured
+	-- builders were triggering same-turn re-hires straight back into the same
+	-- death trap (5 builder IDs in one Norway session).
 	if emp.builders < emp.cities * WANT_BUILDERS_PER_CITY
 	   and not g_builderIdleLastTurn and not g_builderIdleThisTurn then
-		return "UNIT_BUILDER";
+		g_builderShortTurns = g_builderShortTurns + 1;
+		if g_builderShortTurns >= 2 then
+			return "UNIT_BUILDER";
+		end
+	else
+		g_builderShortTurns = 0;
 	end
 	if emp.military < emp.cities * WANT_MILITARY_PER_CITY then return nil end  -- advisor picks WHICH soldier
 	return nil;

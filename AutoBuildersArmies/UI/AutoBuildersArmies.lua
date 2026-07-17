@@ -50,6 +50,7 @@ local g_retasks     = {}    -- [unitID]=count of re-tasks this turn. A unit whos
                             -- re-issue forever within one turn.
 local g_pantheonDone  = false -- pantheon requested this turn (async; see g_envoyDone)
 local g_religionDone  = false -- religion founding requested this turn (async)
+local g_policyDone    = false -- policy slotting requested this turn (async)
 local g_inflight    = {}    -- [unitID]=true, an order is ISSUED but not yet resolved.
                             -- The keystone debounce (issue #3): every Request* is
                             -- async, and a queued SKIP/FORTIFY/FOUND_CITY has no
@@ -350,6 +351,37 @@ local function EnsureOrdered(pUnit, why, retryNextTurn)
 		IssueOp(pUnit,opSkip);
 		Log("UNSTUCK %s %d: %s -> skip", uType, id, why);
 		return true;
+	end
+	-- Deep-wedge levers (issue #14, warrior 131073 live): a unit the engine
+	-- wakes next to an adjacent enemy can refuse skip/fortify/sleep ALL AT
+	-- ONCE. Two things stay legal in that state: ALERT, and simply WALKING --
+	-- movement in zone-of-control is always allowed. Step toward home.
+	local opAlert = ResolveOp(UnitOperationTypes.ALERT, "UNITOPERATION_ALERT");
+	if CanStart(pUnit, opAlert) then
+		IssueOp(pUnit,opAlert);
+		Log("UNSTUCK %s %d: %s -> alert", uType, id, why);
+		return true;
+	end
+	local pPlayer = Players[Game.GetLocalPlayer()];
+	if pPlayer ~= nil then
+		local ux, uy = pUnit:GetX(), pUnit:GetY();
+		local okR, reach = pcall(function() return UnitManager.GetReachableMovement(pUnit); end);
+		if okR and reach ~= nil then
+			local home = NearestOwnCityPlot(pPlayer, ux, uy);
+			local best, bestD = nil, 9999;
+			for _, idx in ipairs(reach) do
+				local plot = Map.GetPlotByIndex(idx);
+				if plot ~= nil and not (plot:GetX() == ux and plot:GetY() == uy) then
+					local d = (home ~= nil)
+						and Map.GetPlotDistance(plot:GetX(), plot:GetY(), home:GetX(), home:GetY()) or 0;
+					if d < bestD then bestD, best = d, plot end
+				end
+			end
+			if best ~= nil and MoveTo(pUnit, best:GetX(), best:GetY()) then
+				Log("UNSTUCK %s %d: %s -> stepping out to %d,%d", uType, id, why, best:GetX(), best:GetY());
+				return true;
+			end
+		end
 	end
 	-- All ops refused. First time is usually the newly-trained-unit beat -- the
 	-- engine refuses everything for one event cycle then accepts (observed
@@ -661,8 +693,7 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 		end
 	end
 
-	local bestScore, bestDist = -1, 9999;
-	best = nil;
+	local candidates = {};
 	for _, pCity in pCities:Members() do
 		local cx, cy = pCity:GetX(), pCity:GetY();
 		for dx = -3, 3 do
@@ -687,19 +718,37 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 							if okY and y ~= nil then score = score + y end
 						end
 						local d = Map.GetPlotDistance(ux, uy, plot:GetX(), plot:GetY());
-						if score > bestScore or (score == bestScore and d < bestDist) then
-							bestScore, bestDist, best = score, d, plot;
-						end
+						candidates[#candidates + 1] = { plot = plot, score = score, dist = d };
 					end
 				end
 			end
 		end
 	end
-	if best ~= nil then
-		Log("builder %d: advisor empty, own scan -> %d,%d (score %d)",
-			pUnit:GetID(), best:GetX(), best:GetY(), bestScore);
+
+	-- Best-first, but only a plot the builder can actually PATH to wins --
+	-- issue #13: the scan kept electing an unreachable plot and MoveTo refused
+	-- every pass, skipping the builder turn after turn. Same GetMoveToPathEx
+	-- test the advisor path uses; unreachable plots get blacklisted so the
+	-- next scan starts from the runner-up.
+	table.sort(candidates, function(a, b)
+		if a.score ~= b.score then return a.score > b.score end
+		return a.dist < b.dist;
+	end);
+	for _, c in ipairs(candidates) do
+		if c.plot:GetX() == ux and c.plot:GetY() == uy then
+			return c.plot;   -- already standing on it; no path needed
+		end
+		local okP, pathInfo = pcall(function()
+			return UnitManager.GetMoveToPathEx(pUnit, c.plot:GetIndex());
+		end);
+		if okP and pathInfo ~= nil and pathInfo.plots ~= nil and table.count(pathInfo.plots) > 1 then
+			Log("builder %d: advisor empty, own scan -> %d,%d (score %d)",
+				pUnit:GetID(), c.plot:GetX(), c.plot:GetY(), c.score);
+			return c.plot;
+		end
+		g_plotSkip[c.plot:GetIndex()] = nowTurn + 5;
 	end
-	return best;
+	return nil;
 end
 
 -- Returns "repair" | "build" | "move" | "skip", or nil if NOTHING was issued
@@ -1732,6 +1781,63 @@ local function AutomateReligion(pPlayer)
 	return true;
 end
 
+-- ---------------------------------------------------------------- policies ---
+--
+-- ENDTURN_BLOCKING_FILL_CIVIC_SLOT caught live by the watchdog (issue #12):
+-- empty policy slots block the turn and nothing filled them. Fill EMPTY slots
+-- only -- a policy Anthony slotted himself is never churned. All verified in
+-- UI/Screens/GovernmentScreen.lua: slots :2284-2287, legality :2225-2226 and
+-- the :24 comment (engine checks !IsPolicyActive), commit :1570
+-- pCulture:RequestPolicyChanges(clearList, addList) -- clearList = slot
+-- indices (0-based), addList = [slotIndex] = PolicyHash. Slot compatibility
+-- via Policies.GovernmentSlotType (schema:387); wildcard slots accept any.
+local function AutomatePolicies(pPlayer)
+	if g_policyDone then return false end
+	local okC, pCulture = pcall(function() return pPlayer:GetCulture(); end);
+	if not okC or pCulture == nil then return false end
+
+	local okN, nSlots = pcall(function() return pCulture:GetNumPolicySlots(); end);
+	if not okN or nSlots == nil or nSlots <= 0 then return false end
+
+	local addList, clearList, nAdd = {}, {}, 0;
+	local usedHash = {};   -- one policy can fill only one slot per request
+	for i = 0, nSlots - 1 do
+		local okS, slotPolicy = pcall(function() return pCulture:GetSlotPolicy(i); end);
+		if okS and (slotPolicy == nil or slotPolicy == -1) then
+			local okT, slotType = pcall(function() return pCulture:GetSlotType(i); end);
+			local slotRow  = okT and GameInfo.GovernmentSlots[slotType] or nil;
+			local slotName = (slotRow ~= nil) and slotRow.GovernmentSlotType or nil;
+			if slotName ~= nil then
+				for row in GameInfo.Policies() do
+					if not usedHash[row.PolicyHash or row.Hash] then
+						local h = row.PolicyHash or row.Hash;
+						local fits = (row.GovernmentSlotType == slotName)
+							or (slotName == "SLOT_WILDCARD");
+						if fits then
+							local okU, unlocked = pcall(function() return pCulture:IsPolicyUnlocked(h); end);
+							local okO, obsolete = pcall(function() return pCulture:IsPolicyObsolete(h); end);
+							local okA, active   = pcall(function() return pCulture:IsPolicyActive(row.Index); end);
+							if okU and unlocked == true and okO and obsolete ~= true
+							   and okA and active ~= true then
+								addList[i] = h;
+								usedHash[h] = true;
+								nAdd = nAdd + 1;
+								Log("policy slot %d (%s) -> %s", i, slotName, tostring(row.PolicyType));
+								break;
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if nAdd == 0 then return false end
+	pCulture:RequestPolicyChanges(clearList, addList);
+	g_policyDone = true;
+	return true;
+end
+
 -- ------------------------------------------------- city production ----------
 --
 -- Same philosophy as research: the city's own AI already knows what it wants
@@ -2226,6 +2332,7 @@ local function RunAutomation()
 		AutomateEnvoys(pPlayer);
 		AutomatePantheon(pPlayer);
 		AutomateReligion(pPlayer);
+		AutomatePolicies(pPlayer);
 	end
 	if g_produce then
 		AutomateProduction(pPlayer, threats);
@@ -2449,6 +2556,7 @@ local function OnLocalPlayerTurnBegin()
 	g_envoyDone      = false;
 	g_pantheonDone   = false;
 	g_religionDone   = false;
+	g_policyDone     = false;
 	g_builderIdleLastTurn = g_builderIdleThisTurn;
 	g_builderIdleThisTurn = false;
 	local e = Game.GetLocalPlayer();
@@ -2534,10 +2642,12 @@ local function OnUnitOpResolved(player, unitID, hCommand, iData1)
 				if n == MAX_RETASKS + 1 then
 					Log("unit %d: re-task cap (%d) -- forcing rest", unitID, MAX_RETASKS);
 					local opSleep = ResolveOp(UnitOperationTypes.SLEEP, "UNITOPERATION_SLEEP");
-					local opSkip  = ResolveOp(UnitOperationTypes.SKIP_TURN, "UNITOPERATION_SKIP_TURN");
 					if CanStart(pUnit, opSleep) then IssueOp(pUnit, opSleep);
-					elseif CanStart(pUnit, opSkip) then IssueOp(pUnit, opSkip);
-					else Log("STUCK unit %d: cap hit and even sleep/skip refused -- WILL block the turn", unitID) end
+					else
+						-- Full lever chain incl. ALERT + step-out (issue #14 --
+						-- sleep AND skip were both refused live).
+						EnsureOrdered(pUnit, "re-task cap", true);
+					end
 				end
 				return;
 			end

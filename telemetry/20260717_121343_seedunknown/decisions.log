@@ -1,0 +1,119 @@
+AutoBuildersArmies: [ABA] init: panel found
+AutoBuildersArmies: [ABA] init: context  size=1024,768 offset=0,0 hidden=false
+AutoBuildersArmies: [ABA] init: ABA_Root size=220,378 offset=798,190 hidden=false
+AutoBuildersArmies: [ABA] init: parent   size=0,0 offset=0,0 hidden=false
+AutoBuildersArmies: [ABA] init: screen   1024 x 768
+AutoBuildersArmies: [ABA] auto-research -> TECH_SAILING
+AutoBuildersArmies: [ABA] settler 65536: founding city at 51,30
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_POKROVKA]: 0 builder(s) for 1 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_POKROVKA] -> UNIT_SETTLER
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 196608 -> build
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 52,30 (score 4)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_CRAFTSMANSHIP
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_FILL_CIVIC_SLOT
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_ANIMAL_HUSBANDRY
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 52,30 (score 4)
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 52,30 (score 4)
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_POKROVKA] -> UNIT_SETTLER
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 52,30 (score 4)
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] settler 262146: committed to site 47,30 (2 turns)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 52,30 (score 4)
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 52,30 (score 4)
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] settler 262146: enemy 2 tiles away, fleeing home
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_ASTROLOGY
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 196608 -> build
+AutoBuildersArmies: [ABA] promote unit 131073 -> PROMOTION_BATTLECRY (2 offered)
+AutoBuildersArmies: [ABA] settler 262146: committed to site 48,27 (3 turns)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_POKROVKA] -> UNIT_SCOUT
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] unit UNIT_SETTLER 327683: settler: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] settler 327683: committed to site 54,28 (3 turns)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] auto-research -> TECH_ARCHERY
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 52,30 (score 4)
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] unit UNIT_BUILDER 196608: builder: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] unit UNIT_SETTLER 262146: settler: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_ARCHERY
+AutoBuildersArmies: [ABA] builder 196608 -> build
+AutoBuildersArmies: [ABA] settler 262146: enemy 1 tiles away, fleeing home
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_FOREIGN_TRADE
+AutoBuildersArmies: [ABA] produce [LOC_CITY_NAME_POKROVKA]: vetoing advisor's UNIT_SETTLER (settler cap)
+AutoBuildersArmies: [ABA] produce [LOC_CITY_NAME_POKROVKA]: advisor empty (1 recs, 0 usable), own advisor -> rank 1
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_POKROVKA] -> UNIT_SCOUT
+AutoBuildersArmies: [ABA] scout 393220 -> auto-explore
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] settler 327683: founding city at 54,28
+AutoBuildersArmies: [ABA] unit UNIT_SETTLER 327683: settler: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] unit UNIT_SETTLER 327683: settler: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] scout 393220 -> auto-explore
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_PAZYRYK]: enemy 2 tiles out -> UNIT_WARRIOR
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_POKROVKA]: 0 builder(s) for 2 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] settler 262146: committed to site 53,33 (3 turns)
+AutoBuildersArmies: [ABA] scout 458755 -> auto-explore
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] unit 262146: re-task cap (4) -- forcing rest
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] unit 131073: re-task cap (4) -- forcing rest
+AutoBuildersArmies: [ABA] STUCK unit 131073: cap hit and even sleep/skip refused -- WILL block the turn
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS

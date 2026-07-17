@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="b4adc9aa-aa5e-4e8d-bb5e-c7bd70dfdfac" version="1">
+  <Properties>
+    <Name>Auto Builders &amp; Armies</Name>
+    <Teaser>Point at a city and every army marches. Builders, research and civics run themselves. Single-player, toggleable.</Teaser>
+    <Description>Adds the automation the base game hides, so you direct the war instead of clicking a thousand units.
+
+ATTACK ORDER: click any enemy city on the map, press ATTACK, and every combat unit marches on that city and assaults it — ranged units bombard it, melee close in. Press Stand Down to call them off. The order clears itself once the city is yours.
+
+BUILDERS: auto-move to the best tile and build the engine's recommended improvement, repairing pillaged tiles first, never wasting a charge on a bad tile.
+
+RESEARCH + CIVICS: whenever a slot goes idle it is filled instantly with the game's own Grand Strategic AI recommendation — the same pick the advisor star shows in the tech tree.
+
+MILITARY: ranged fire from safety, melee only weaker/wounded foes, heal when hurt, hold the line when idle, optionally advance on the nearest enemy.
+
+Everything runs on your turn only, is fully toggleable from an on-screen panel, and hard-disables itself in multiplayer.</Description>
+    <Authors>drlor</Authors>
+    <AffectsSavedGames>0</AffectsSavedGames>
+    <CompatibleVersions>2.0</CompatibleVersions>
+  </Properties>
+  <InGameActions>
+    <AddUserInterfaces id="AutoBuildersArmies_AddIn">
+      <Properties>
+        <Context>InGame</Context>
+      </Properties>
+      <File>UI/AutoBuildersArmies.xml</File>
+    </AddUserInterfaces>
+  </InGameActions>
+  <Files>
+    <File>UI/AutoBuildersArmies.xml</File>
+    <File>UI/AutoBuildersArmies.lua</File>
+  </Files>
+</Mod>

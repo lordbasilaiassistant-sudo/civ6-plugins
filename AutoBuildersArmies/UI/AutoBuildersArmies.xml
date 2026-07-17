@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Auto Builders & Armies : on-screen control panel.
+     This XML is a shell context; the identically-named AutoBuildersArmies.lua auto-binds and holds all logic.
+
+     Sizing note: every size here is EXPLICIT and the frame carries a MinSize,
+     because every base-game use of an "auto" height pairs it with a MinSize.
+     (Note: XML comments may not contain a double hyphen.) -->
+<Context Name="AutoBuildersArmies">
+  <!-- Anchored L,T on purpose. Our parent (InGame.xml:133 "AdditionalUserInterfaces")
+       declares no Size, so a right-anchored panel can resolve against a 0-width
+       parent and land off-screen. Anchoring left and setting OffsetX from the real
+       screen width in Lua puts it on the right correctly whether the parent is
+       full-size or 0x0. -->
+  <Container ID="ABA_Root" Anchor="L,T" Offset="0,190" Size="220,378">
+    <Grid ID="ABA_Frame" Anchor="L,T" Size="220,378" MinSize="220,60" Texture="Controls_GossipContainer" SliceTextureSize="32,32" SliceCorner="16,16" Color="36,49,59,255">
+      <Stack ID="ABA_Stack" Anchor="L,T" Offset="10,8" StackGrowth="Down" StackPadding="4">
+
+        <Button ID="ABA_HeaderBtn" Size="196,24" ToolTip="Click to collapse / expand the Auto Commander panel.">
+          <Label ID="ABA_Title" Anchor="L,C" Offset="2,0" Style="BodyText14" String="AUTO COMMANDER"/>
+          <Label ID="ABA_Caret" Anchor="R,C" Offset="2,0" Style="BodyText14" String="[-]"/>
+        </Button>
+
+        <Stack ID="ABA_Body" Anchor="L,T" StackGrowth="Down" StackPadding="4">
+          <Button ID="ABA_MasterBtn" Size="196,34" Style="ButtonNormalText" ToolTip="Master switch. When OFF nothing is automated and the game plays exactly as normal.">
+            <Label ID="ABA_MasterLbl" Anchor="C,C" Style="BodyText14" String="AUTO: OFF"/>
+          </Button>
+
+          <Button ID="ABA_BuildersBtn" Size="196,30" Style="ButtonNormalText" ToolTip="Automate Builders: repair pillaged tiles first, then move to the best tile and build the game's recommended improvement. Never spends a charge on a bad tile.">
+            <Label ID="ABA_BuildersLbl" Anchor="C,C" Style="BodyText12" String="Builders: ON"/>
+          </Button>
+
+          <Button ID="ABA_ArmiesBtn" Size="196,30" Style="ButtonNormalText" ToolTip="Automate Military: fire ranged units from safety, melee only weaker/wounded foes, heal when hurt, fortify when idle. Defensive by default.">
+            <Label ID="ABA_ArmiesLbl" Anchor="C,C" Style="BodyText12" String="Armies: OFF"/>
+          </Button>
+
+          <Button ID="ABA_ResearchBtn" Size="196,30" Style="ButtonNormalText" ToolTip="Auto-pick Research and Civics whenever one finishes, using the game's own Grand Strategic AI recommendation (the same star the tech tree shows). Never leaves you idle.">
+            <Label ID="ABA_ResearchLbl" Anchor="C,C" Style="BodyText12" String="Research: OFF"/>
+          </Button>
+
+          <Button ID="ABA_ProduceBtn" Size="196,30" Style="ButtonNormalText" ToolTip="Auto-pick city production whenever a city goes idle, using that city's own AI recommendation. Never overrides something you chose yourself. Districts are left to you (they need a tile placement).">
+            <Label ID="ABA_ProduceLbl" Anchor="C,C" Style="BodyText12" String="Production: ON"/>
+          </Button>
+
+          <Button ID="ABA_AdvanceBtn" Size="196,26" Style="ButtonNormalText" ToolTip="March idle healthy units toward the nearest known enemy (including barbarians) along tiles judged safe. Wounded units heal first. Requires Armies ON. Ignored while an ATTACK TARGET is set.">
+            <Label ID="ABA_AdvanceLbl" Anchor="C,C" Style="BodyText12" String="Advance: ON"/>
+          </Button>
+
+          <Box ID="ABA_Sep" Size="196,1" Color="0x40FFFFFF"/>
+
+          <Label ID="ABA_TargetHint" Anchor="L,T" Offset="2,0" Style="BodyText12" WrapWidth="192" String="Click an enemy city, then ATTACK."/>
+
+          <Button ID="ABA_AttackBtn" Size="196,34" Style="ButtonNormalText" ToolTip="ALL-IN ASSAULT: every combat unit marches on the target city and attacks it. Click an enemy city banner on the map first to pick the target. Turns Armies ON automatically.">
+            <Label ID="ABA_AttackLbl" Anchor="C,C" Style="BodyText14" String="ATTACK"/>
+          </Button>
+
+          <Button ID="ABA_ClearBtn" Size="196,24" Style="ButtonNormalText" ToolTip="Clear the attack target. Units revert to the normal Armies behaviour (defend / heal / hold).">
+            <Label ID="ABA_ClearLbl" Anchor="C,C" Style="BodyText12" String="Stand Down"/>
+          </Button>
+
+          <Label ID="ABA_Status" Anchor="L,T" Offset="2,0" Style="BodyText12" WrapWidth="192" String="Ready."/>
+        </Stack>
+
+      </Stack>
+    </Grid>
+  </Container>
+</Context>

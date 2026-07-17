@@ -1,0 +1,8 @@
+{"turn": 1, "era": -1, "score": 0, "cities": 0, "pop": 0, "units": 2, "mil": 1, "sci": 0.0, "cul": 0.0, "gpt": 0.0, "gold": 5, "fpt": 0.0, "techs": 0}
+{"turn": 2, "era": -1, "score": 6, "cities": 1, "pop": 1, "units": 1, "mil": 1, "sci": 2.8, "cul": 1.4, "gpt": 5.3, "gold": 10, "fpt": 0.0, "techs": 0}
+{"turn": 3, "era": -1, "score": 6, "cities": 1, "pop": 1, "units": 1, "mil": 1, "sci": 2.8, "cul": 1.4, "gpt": 5.3, "gold": 15, "fpt": 0.0, "techs": 0}
+{"turn": 4, "era": -1, "score": 7, "cities": 1, "pop": 2, "units": 1, "mil": 1, "sci": 3.6, "cul": 1.7, "gpt": 5.3, "gold": 20, "fpt": 0.0, "techs": 0}
+{"turn": 5, "era": -1, "score": 7, "cities": 1, "pop": 2, "units": 1, "mil": 1, "sci": 3.6, "cul": 1.7, "gpt": 5.3, "gold": 26, "fpt": 1.0, "techs": 0}
+{"turn": 6, "era": -1, "score": 9, "cities": 1, "pop": 2, "units": 1, "mil": 1, "sci": 3.6, "cul": 1.7, "gpt": 5.3, "gold": 31, "fpt": 1.0, "techs": 1}
+{"turn": 7, "era": -1, "score": 10, "cities": 1, "pop": 3, "units": 2, "mil": 1, "sci": 4.1, "cul": 1.9, "gpt": 5.0, "gold": 36, "fpt": 1.0, "techs": 1}
+{"turn": 8, "era": -1, "score": 12, "cities": 1, "pop": 3, "units": 2, "mil": 1, "sci": 4.1, "cul": 1.9, "gpt": 5.0, "gold": 41, "fpt": 1.0, "techs": 1}

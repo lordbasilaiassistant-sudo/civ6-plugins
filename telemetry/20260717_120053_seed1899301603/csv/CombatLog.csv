@@ -1,0 +1,2 @@
+Game Turn, Attacking Civ, DefendingCiv, AttackerObjType, DefenderObjType, Attacker Type, Defender Type, AttackerID, DefenderID, AttackerStr, DefenderStr, AttackerStrMod, DefenderStrMod, AttackerDmg, DefenderDmg
+7, 9, 63, 1:1, 196610:262147, UNIT_WARRIOR, UNIT_SCOUT, 20, 10, 0, 3, 18, 42

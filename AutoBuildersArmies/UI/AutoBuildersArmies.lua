@@ -67,6 +67,14 @@ local g_builderIdleThisTurn = false  -- Composition must not queue ANOTHER build
                                      -- one is already unemployed (issue #5: builders
                                      -- stacked up at cities). Last/this pair because
                                      -- production decides BEFORE builders sweep.
+local g_plotSkip    = {}    -- [plotIndex]=expiry turn. A plot where a builder stood
+                            -- and found NOTHING legal to build (tech not in yet --
+                            -- issue #9) is excluded from the scan for a few turns so
+                            -- the builder moves on instead of re-picking it forever.
+local g_refused     = {}    -- [unitID]=count of consecutive all-ops-refused passes.
+                            -- Newly trained units refuse everything for one event
+                            -- beat then accept (issue #10) -- only the SECOND
+                            -- consecutive refusal is a real stuck worth shouting.
 local g_districtNoPlot = {}   -- ["cityID:hash"]=true, district had no legal plot this
                               -- turn; excluded from recs so the city falls through to
                               -- its next-best option instead of retrying every pass.
@@ -187,6 +195,7 @@ end
 -- spurious STUCK line of the first live session (issue #3).
 local function IssueOp(pUnit, op, tParams)
 	g_inflight[pUnit:GetID()] = true;
+	g_refused[pUnit:GetID()]  = nil;   -- an accepted order resets the refusal streak
 	if tParams ~= nil then
 		UnitManager.RequestOperation(pUnit, op, tParams);
 	else
@@ -342,9 +351,16 @@ local function EnsureOrdered(pUnit, why, retryNextTurn)
 		Log("UNSTUCK %s %d: %s -> skip", uType, id, why);
 		return true;
 	end
-	-- If we ever land here the turn really will block, so say so in as many words
-	-- rather than leaving Anthony to guess which unit is holding the game.
-	Log("STUCK %s %d: %s -- every fallback op refused; this unit WILL block the turn", uType, id, why);
+	-- All ops refused. First time is usually the newly-trained-unit beat -- the
+	-- engine refuses everything for one event cycle then accepts (observed
+	-- live, issue #10) -- so shout only on the SECOND consecutive refusal.
+	local n = (g_refused[id] or 0) + 1;
+	g_refused[id] = n;
+	if n == 1 then
+		Log("unit %s %d: %s -- ops refused once (likely spawn-beat; retrying)", uType, id, why);
+	elseif n == 2 then
+		Log("STUCK %s %d: %s -- every fallback op refused twice; this unit WILL block the turn", uType, id, why);
+	end
 	return false;
 end
 
@@ -619,6 +635,32 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 	-- luxuries/strategics), then highest raw yield; nearest breaks ties.
 	local ux, uy = pUnit:GetX(), pUnit:GetY();
 	local eOwner = pPlayer:GetID();
+	local nowTurn = Game.GetCurrentGameTurn();
+
+	-- Tech-awareness (issue #9, Anthony's diagnosis: "sometimes research needs
+	-- to come first"). A resource tile can ONLY take its matching improvement,
+	-- so a resource whose improvement tech is not researched makes the whole
+	-- plot untouchable -- exclude it or the builder parks there forever.
+	-- Mapping via GameInfo.Improvement_ValidResources (the exact table
+	-- PlotToolTip.lua:257 walks), prereq via Improvements.PrereqTech + HasTech
+	-- (WorldRankings.lua:1332).
+	local resourceOK = {};
+	local okT, pTechs = pcall(function() return pPlayer:GetTechs(); end);
+	if okT and pTechs ~= nil then
+		for row in GameInfo.Improvement_ValidResources() do
+			local imp = GameInfo.Improvements[row.ImprovementType];
+			if imp ~= nil then
+				local usable = (imp.PrereqTech == nil);
+				if not usable then
+					local t = GameInfo.Technologies[imp.PrereqTech];
+					local okH, has = pcall(function() return pTechs:HasTech(t.Index); end);
+					usable = (t ~= nil) and okH and has == true;
+				end
+				if usable then resourceOK[row.ResourceType] = true end
+			end
+		end
+	end
+
 	local bestScore, bestDist = -1, 9999;
 	best = nil;
 	for _, pCity in pCities:Members() do
@@ -631,16 +673,23 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 				   and not plot:IsWater() and not plot:IsImpassable()
 				   and plot:GetImprovementType() == -1
 				   and plot:GetDistrictType() == -1
-				   and not plot:IsCity() then
-					local score = 0;
-					if plot:GetResourceType() ~= -1 then score = score + 100 end
-					for yRow in GameInfo.Yields() do
-						local okY, y = pcall(function() return plot:GetYield(yRow.Index); end);
-						if okY and y ~= nil then score = score + y end
-					end
-					local d = Map.GetPlotDistance(ux, uy, plot:GetX(), plot:GetY());
-					if score > bestScore or (score == bestScore and d < bestDist) then
-						bestScore, bestDist, best = score, d, plot;
+				   and not plot:IsCity()
+				   and (g_plotSkip[plot:GetIndex()] == nil or g_plotSkip[plot:GetIndex()] <= nowTurn) then
+					local resIdx  = plot:GetResourceType();
+					local resRow  = (resIdx ~= -1) and GameInfo.Resources[resIdx] or nil;
+					local resName = (resRow ~= nil) and resRow.ResourceType or nil;
+					-- Unimprovable-resource plots are skipped outright.
+					if resName == nil or resourceOK[resName] then
+						local score = 0;
+						if resName ~= nil then score = score + 100 end
+						for yRow in GameInfo.Yields() do
+							local okY, y = pcall(function() return plot:GetYield(yRow.Index); end);
+							if okY and y ~= nil then score = score + y end
+						end
+						local d = Map.GetPlotDistance(ux, uy, plot:GetX(), plot:GetY());
+						if score > bestScore or (score == bestScore and d < bestDist) then
+							bestScore, bestDist, best = score, d, plot;
+						end
 					end
 				end
 			end
@@ -671,6 +720,14 @@ local function AutomateBuilder(pUnit, pPlayer)
 	if plot ~= nil and plot:GetImprovementType() == -1 then
 		local tParams = { [UnitOperationTypes.PARAM_X] = x, [UnitOperationTypes.PARAM_Y] = y };
 		local ok, res = UnitManager.CanStartOperation(pUnit, UnitOperationTypes.BUILD_IMPROVEMENT, nil, tParams, true);
+		if not (ok and res ~= nil and res[UnitOperationResults.IMPROVEMENTS] ~= nil and #res[UnitOperationResults.IMPROVEMENTS] > 0) then
+			-- Standing on an unimproved tile with NOTHING legal to build: the
+			-- scan liked this plot but the game disagrees (usually a missing
+			-- tech the resource filter could not see -- features, appeal rules).
+			-- Blacklist it briefly so the next pick is a DIFFERENT plot instead
+			-- of shuttling back here every pass (issue #9).
+			g_plotSkip[plot:GetIndex()] = Game.GetCurrentGameTurn() + 5;
+		end
 		if ok and res ~= nil and res[UnitOperationResults.IMPROVEMENTS] ~= nil and #res[UnitOperationResults.IMPROVEMENTS] > 0 then
 			local eBest = res[UnitOperationResults.BEST_IMPROVEMENT];
 			if eBest == nil or eBest == -1 then eBest = res[UnitOperationResults.IMPROVEMENTS][1] end
@@ -2388,6 +2445,7 @@ local function OnLocalPlayerTurnBegin()
 	g_districtNoPlot = {};
 	g_inflight       = {};
 	g_woken          = {};
+	g_refused        = {};
 	g_envoyDone      = false;
 	g_pantheonDone   = false;
 	g_religionDone   = false;

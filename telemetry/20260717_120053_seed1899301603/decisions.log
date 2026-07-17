@@ -1,0 +1,18 @@
+AutoBuildersArmies: [ABA] init: panel found
+AutoBuildersArmies: [ABA] init: context  size=1024,768 offset=0,0 hidden=false
+AutoBuildersArmies: [ABA] init: ABA_Root size=220,378 offset=798,190 hidden=false
+AutoBuildersArmies: [ABA] init: parent   size=0,0 offset=0,0 hidden=false
+AutoBuildersArmies: [ABA] init: screen   1024 x 768
+AutoBuildersArmies: [ABA] auto-research -> TECH_SAILING
+AutoBuildersArmies: [ABA] settler 65536: founding city at 54,19
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_RIO_DE_JANEIRO]: 0 builder(s) for 1 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] auto-research -> TECH_ASTROLOGY
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_RIO_DE_JANEIRO]: enemy 3 tiles out -> UNIT_WARRIOR
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 53,17 (score 105)
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] STUCK UNIT_BUILDER 196608: builder: no order issued -- every fallback op refused; this unit WILL block the turn
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 53,17 (score 105)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_CRAFTSMANSHIP
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move

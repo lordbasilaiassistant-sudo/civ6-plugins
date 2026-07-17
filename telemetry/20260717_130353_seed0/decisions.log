@@ -1,0 +1,1778 @@
+AutoBuildersArmies: [ABA] init: panel found
+AutoBuildersArmies: [ABA] init: context  size=1024,768 offset=0,0 hidden=false
+AutoBuildersArmies: [ABA] init: ABA_Root size=220,378 offset=798,190 hidden=false
+AutoBuildersArmies: [ABA] init: parent   size=0,0 offset=0,0 hidden=false
+AutoBuildersArmies: [ABA] init: screen   1024 x 768
+AutoBuildersArmies: [ABA] auto-research -> TECH_SAILING
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] settler 65536: founding city at 77,55
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_DELHI]: 0 builder(s) for 1 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_DELHI] -> BUILDING_MONUMENT
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] builder 196608 -> build
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 77,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 77,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 78,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_CRAFTSMANSHIP
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 0 (SLOT_MILITARY) -> POLICY_DISCIPLINE
+AutoBuildersArmies: [ABA] policy slot 1 (SLOT_ECONOMIC) -> POLICY_GOD_KING
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 78,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_FILL_CIVIC_SLOT
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 0 (SLOT_MILITARY) -> POLICY_DISCIPLINE
+AutoBuildersArmies: [ABA] policy slot 1 (SLOT_ECONOMIC) -> POLICY_GOD_KING
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_ANIMAL_HUSBANDRY
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_FILL_CIVIC_SLOT
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=2 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=-1
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=-1
+AutoBuildersArmies: [ABA] policy slot 0 (SLOT_MILITARY) -> POLICY_DISCIPLINE
+AutoBuildersArmies: [ABA] policy slot 1 (SLOT_ECONOMIC) -> POLICY_GOD_KING
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 77,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 77,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_DELHI] -> UNIT_SETTLER
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 78,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_ASTROLOGY
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 -> build
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_FOREIGN_TRADE
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 78,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 78,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 77,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_DELHI] -> UNIT_SETTLER
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 77,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] settler 262146: committed to site 75,58 (3 turns)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_ARCHERY
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 78,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_MYSTICISM
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 78,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 77,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] settler 262146: founding city at 75,58
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] produce [LOC_CITY_NAME_AGRA]: advisor empty (0 recs, 0 usable), own advisor -> rank 1
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_AGRA] -> UNIT_SCOUT
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 77,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PANTHEON
+AutoBuildersArmies: [ABA] pantheon -> BELIEF_RELIGIOUS_SETTLEMENTS (rank 4)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 78,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_MILITARY_TRADITION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 78,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_HORSEBACK_RIDING
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 79,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_DELHI]: enemy 3 tiles out -> UNIT_WARRIOR
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_AGRA]: enemy 2 tiles out -> UNIT_WARRIOR
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] unit UNIT_SETTLER 327682: settler: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] combat 393219 declined: hp=100 str=10 threat=2 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit UNIT_SCOUT 393219: recon: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 79,55 (score 3)
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 79,55 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] unit UNIT_BUILDER 196608: builder: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 77,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_SETTLER 327682: settler: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 2 tiles)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_SETTLER 327682: settler: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 2 tiles)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 77,54 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_BUILDER 196608: builder: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_SETTLER 327682: settler: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 2 -> 3 tiles)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_DELHI]: enemy 1 tiles out -> UNIT_WARRIOR
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 78,54 (score 3)
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_SETTLER 327682: settler: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 3 -> 4 tiles)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_STATE_WORKFORCE
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 -> move
+AutoBuildersArmies: [ABA] promote unit 131073 -> PROMOTION_BATTLECRY (2 offered)
+AutoBuildersArmies: [ABA] settler 327682: committed to site 80,53 (3 turns)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] envoy -> [LOC_CIVILIZATION_STOCKHOLM_NAME] (0 token(s) left)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608 -> build
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 3 tiles)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 196608: advisor empty, own scan -> 75,55 (score 3)
+AutoBuildersArmies: [ABA] builder 196608: MOVE_TO 75,55 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 196608 -> idle
+AutoBuildersArmies: [ABA] unit UNIT_BUILDER 196608: builder: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_GIVE_INFLUENCE_TOKEN
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_DELHI]: 0 builder(s) for 2 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 2 -> 4 tiles)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] settler 327682: founding city at 80,53
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_CALCUTTA]: 1 builder(s) for 3 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_AGRA]: enemy 3 tiles out -> UNIT_WARRIOR
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] unit 458756: alone (2 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] promote unit 393219 -> PROMOTION_RANGER (2 offered)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 458756: alone (2 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 458756: alone (2 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] unit 458756: alone (2 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 458756: alone (1 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 458756: alone (1 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 2 -> 5 tiles)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 458756: alone (1 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 458756: alone (1 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] auto-research -> TECH_MINING
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_DELHI]: enemy 4 tiles out -> UNIT_INDIAN_VARU
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_MINING
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] unit 458756: alone (1 near) -> rallying to 77,58
+AutoBuildersArmies: [ABA] builder 655365 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] auto-research -> TECH_BRONZE_WORKING
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_GAMES_RECREATION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=74 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit UNIT_WARRIOR 524288: army: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=1 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit UNIT_WARRIOR 131073: army: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] auto-research -> TECH_BRONZE_WORKING
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_GAMES_RECREATION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] auto-research -> TECH_BRONZE_WORKING
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_GAMES_RECREATION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_BRONZE_WORKING
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_GAMES_RECREATION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=86 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_AGRA]: enemy 3 tiles out -> UNIT_INDIAN_VARU
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 3 tiles)
+AutoBuildersArmies: [ABA] builder 655365 -> build
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=84 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=11 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 720902: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=94 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=21 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=96 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_THE_WHEEL
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_CALCUTTA]: enemy 1 tiles out -> UNIT_INDIAN_VARU
+AutoBuildersArmies: [ABA] builder 655365 -> move
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=31 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=41 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 -> build
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=51 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 2 -> 5 tiles)
+AutoBuildersArmies: [ABA] builder 655365 -> build
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] auto-research -> TECH_CELESTIAL_NAVIGATION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365: MOVE_TO 80,52 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 655365 -> idle
+AutoBuildersArmies: [ABA] unit UNIT_BUILDER 655365: builder: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] builder 786439: MOVE_TO 81,51 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 786439 -> idle
+AutoBuildersArmies: [ABA] unit UNIT_BUILDER 786439: builder: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_CELESTIAL_NAVIGATION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=61 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 4 tiles)
+AutoBuildersArmies: [ABA] builder 655365 -> move
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365: MOVE_TO 76,53 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 655365 -> idle
+AutoBuildersArmies: [ABA] unit UNIT_BUILDER 655365: builder: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] builder 786439: MOVE_TO 76,53 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 786439 -> idle
+AutoBuildersArmies: [ABA] unit UNIT_BUILDER 786439: builder: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=71 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] builder 655365 -> move
+AutoBuildersArmies: [ABA] builder 786439 -> build
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_DELHI]: enemy 2 tiles out -> UNIT_INDIAN_VARU
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=76 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit UNIT_WARRIOR 524288: army: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] combat 393219 declined: hp=43 str=10 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit UNIT_SCOUT 393219: recon: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439: MOVE_TO 81,52 refused -- blacklisting plot
+AutoBuildersArmies: [ABA] builder 786439 -> idle
+AutoBuildersArmies: [ABA] unit UNIT_BUILDER 786439: builder: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] combat 851976 declined: hp=100 str=40 threat=2 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit UNIT_INDIAN_VARU 851976: army: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=81 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 2 -> 5 tiles)
+AutoBuildersArmies: [ABA] builder 655365 -> move
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] promote unit 524288 -> PROMOTION_BATTLECRY (2 offered)
+AutoBuildersArmies: [ABA] builder 655365 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 655365 -> build
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 3 tiles)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=81 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 458756: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 851976: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_SCOUT 393219: recon: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] auto-research -> TECH_MASONRY
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_CALCUTTA]: 1 builder(s) for 3 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] unit UNIT_INDIAN_VARU 917509: army: no order issued -- ops refused once (likely spawn-beat; retrying)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_MASONRY
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_SCOUT 393219: recon: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_EARLY_EMPIRE
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 524288 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 4 tiles)
+AutoBuildersArmies: [ABA] waking unit 458756: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 524288: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] envoy -> [LOC_CIVILIZATION_STOCKHOLM_NAME] (0 token(s) left)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_CALCUTTA]: 2 builder(s) for 3 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 786439 -> build
+AutoBuildersArmies: [ABA] builder 983049 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 786439 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 -> build
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_SHIPBUILDING
+AutoBuildersArmies: [ABA] auto-civic -> CIVIC_POLITICAL_PHILOSOPHY
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_DELHI]: enemy 4 tiles out -> UNIT_INDIAN_VARU
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_AGRA]: enemy 4 tiles out -> UNIT_INDIAN_VARU
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 4 tiles)
+AutoBuildersArmies: [ABA] waking unit 458756: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 983049 -> move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_CIVIC
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=true changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] builder 983049 -> build
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 458756: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] composition [LOC_CITY_NAME_CALCUTTA]: 2 builder(s) for 3 cities -> UNIT_BUILDER
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219: hurt, retreating (threat 1 -> 4 tiles)
+AutoBuildersArmies: [ABA] waking unit 458756: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 1179655 -> move
+AutoBuildersArmies: [ABA] builder 983049 -> move
+AutoBuildersArmies: [ABA] waking unit 1048586: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 851976: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] scout 393219 -> auto-explore
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 851976: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 -> move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 458756: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 851976: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1048586: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 1114123 declined: hp=100 str=40 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 1114123 declined: hp=100 str=40 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] district plot for DISTRICT_HOLY_SITE: 80,54 (adjacency 1, 3 candidates)
+AutoBuildersArmies: [ABA] auto-produce [LOC_CITY_NAME_CALCUTTA] -> DISTRICT_HOLY_SITE
+AutoBuildersArmies: [ABA] builder 1245184 -> move
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=100 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 -> build
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 1114123 declined: hp=100 str=40 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 -> move
+AutoBuildersArmies: [ABA] builder 983049 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 1114123 declined: hp=100 str=40 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=87 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: order-in-flight
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 -> move
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 983049 -> build
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=87 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 458756: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1048586: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 1114123 declined: hp=100 str=40 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 1114123: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=85 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_RESEARCH
+AutoBuildersArmies: [ABA] auto-research -> TECH_ENGINEERING
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] defense [LOC_CITY_NAME_DELHI]: enemy 4 tiles out -> UNIT_INDIAN_VARU
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 131073: enemy 1 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 131073 declined: hp=100 str=20 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] waking unit 589826: enemy 0 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] combat 589826 declined: hp=95 str=20 threat=0 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] waking unit 720902: enemy 2 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] waking unit 851976: enemy 3 tiles away (was: not-ready-to-move)
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_PRODUCTION
+AutoBuildersArmies: [ABA] END-TURN BLOCKED by ENDTURN_BLOCKING_UNITS
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] combat 720902 declined: hp=100 str=15 threat=1 cohesive=true target=false advance=true
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 720902: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] unit 917509: alone (2 near) -> rallying to 78,58
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_WARRIOR 458756: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 917509: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1310729: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] UNSTUCK UNIT_INDIAN_VARU 1048586: army: no order issued -> skip (retry next turn)
+AutoBuildersArmies: [ABA] policy gate: slots=2 open=0 civicDone=false changeMade=false allowCmds=true
+AutoBuildersArmies: [ABA] policy slot 0: type=SLOT_MILITARY current=0
+AutoBuildersArmies: [ABA] policy slot 1: type=SLOT_ECONOMIC current=3
+AutoBuildersArmies: [ABA] builder 1245184 SKIPPED: not-ready-to-move
+AutoBuildersArmies: [ABA] builder 1179655 SKIPPED: not-ready-to-move

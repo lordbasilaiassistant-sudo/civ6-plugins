@@ -306,6 +306,39 @@ local function MoveTo(pUnit, x, y)
 		Log("unit %d: MOVE_TO %d,%d accepted only without modifiers", pUnit:GetID(), x, y);
 		return true;
 	end
+	-- PATH-LEG FALLBACK (issue #13, the fix): five sessions of evidence say
+	-- this engine refuses MOVE_TO for far destinations even with a valid
+	-- GetMoveToPathEx path (land maps, no occupancy, no modifiers -- all ruled
+	-- out; warriors' one-tile step-outs always worked). So walk the path one
+	-- reachable leg per turn: intersect the path with GetReachableMovement and
+	-- move to the furthest path plot reachable NOW.
+	local okP, pathInfo = pcall(function()
+		return UnitManager.GetMoveToPathEx(pUnit, Map.GetPlotIndex(x, y));
+	end);
+	if okP and pathInfo ~= nil and pathInfo.plots ~= nil and table.count(pathInfo.plots) > 1 then
+		local okR, reach = pcall(function() return UnitManager.GetReachableMovement(pUnit); end);
+		local reachable = {};
+		if okR and reach ~= nil then
+			for _, idx in ipairs(reach) do reachable[idx] = true end
+		end
+		for i = table.count(pathInfo.plots), 2, -1 do
+			local legIdx = pathInfo.plots[i];
+			if reachable[legIdx] and g_claims[legIdx] == nil then
+				local legPlot = Map.GetPlotByIndex(legIdx);
+				local tLeg = {
+					[UnitOperationTypes.PARAM_X] = legPlot:GetX(),
+					[UnitOperationTypes.PARAM_Y] = legPlot:GetY(),
+				};
+				if CanStart(pUnit, UnitOperationTypes.MOVE_TO, tLeg) then
+					g_claims[legIdx] = pUnit:GetID();
+					IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tLeg);
+					Log("unit %d: far move refused; walking path leg to %d,%d",
+						pUnit:GetID(), legPlot:GetX(), legPlot:GetY());
+					return true;
+				end
+			end
+		end
+	end
 	return false;
 end
 

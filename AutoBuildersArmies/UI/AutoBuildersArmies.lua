@@ -803,6 +803,12 @@ local function AutomateBuilder(pUnit, pPlayer)
 			IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tParams);
 			return "move";
 		end
+		-- Path exists but MOVE_TO still refused (observed live: likely the
+		-- destination is occupied). Whatever the reason, this plot is a dead
+		-- end RIGHT NOW -- blacklist it so the next pass elects the runner-up
+		-- instead of skip-looping on the same tile (issue #13 follow-up).
+		g_plotSkip[target:GetIndex()] = Game.GetCurrentGameTurn() + 3;
+		Log("builder %d: MOVE_TO %d,%d refused -- blacklisting plot", pUnit:GetID(), target:GetX(), target:GetY());
 	end
 
 	-- 4) Nothing worth doing: skip so it stops nagging, re-evaluated next turn.
@@ -1411,6 +1417,14 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 		-- range -> hold here, fight with the attack logic above next pass.
 		local dHere = NearestThreatDist(threats, x, y);
 		if dHere ~= nil and dHere <= 2 then
+			-- SKIP, not FORTIFY: the engine re-wakes fortified units in enemy
+			-- contact instantly, so fortify here is a revolving door -- accepted,
+			-- dropped, reissued, four times to the cap, every single turn
+			-- (warrior 458757 live). Skip is turn-scoped and sticks.
+			if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+				IssueOp(pUnit,UnitOperationTypes.SKIP_TURN);
+				return "stand";
+			end
 			if CanStart(pUnit, UnitOperationTypes.FORTIFY) then
 				IssueOp(pUnit,UnitOperationTypes.FORTIFY);
 				return "stand";
@@ -1798,6 +1812,23 @@ local function AutomatePolicies(pPlayer)
 
 	local okN, nSlots = pcall(function() return pCulture:GetNumPolicySlots(); end);
 	if not okN or nSlots == nil or nSlots <= 0 then return false end
+
+	-- Diagnostics for the not-landing request (issue #12, Germany live): the
+	-- gate the game's own screen checks before allowing changes
+	-- (GovernmentScreen.lua:848), plus the raw slot map. If the request drops
+	-- again, THIS line says why instead of leaving us guessing.
+	local function B(f) local ok, v = pcall(f); return ok and tostring(v) or "ERR" end
+	Log("policy gate: slots=%d open=%s civicDone=%s changeMade=%s allowCmds=%s",
+		nSlots,
+		B(function() return pCulture:GetNumPolicySlotsOpen() end),
+		B(function() return pCulture:CivicCompletedThisTurn() end),
+		B(function() return pCulture:PolicyChangeMade() end),
+		B(function() return Game.IsAllowStrategicCommands(pPlayer:GetID()) end));
+	for i = 0, nSlots - 1 do
+		Log("policy slot %d: type=%s current=%s", i,
+			B(function() return GameInfo.GovernmentSlots[pCulture:GetSlotType(i)].GovernmentSlotType end),
+			B(function() return pCulture:GetSlotPolicy(i) end));
+	end
 
 	local addList, clearList, nAdd = {}, {}, 0;
 	local usedHash = {};   -- one policy can fill only one slot per request

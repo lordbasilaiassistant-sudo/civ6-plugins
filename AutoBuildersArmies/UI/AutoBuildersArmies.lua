@@ -51,6 +51,11 @@ local g_retasks     = {}    -- [unitID]=count of re-tasks this turn. A unit whos
 local g_pantheonDone  = false -- pantheon requested this turn (async; see g_envoyDone)
 local g_religionDone  = false -- religion founding requested this turn (async)
 local g_policyDone    = false -- policy slotting requested this turn (async)
+local g_govDone       = false -- government change requested this turn (async)
+local g_govBlocked    = false -- CONSIDER_GOVERNMENT_CHANGE blocker active: the
+                              -- game itself says pick a government NOW (free
+                              -- window) -- the only time we auto-switch.
+local g_gpDone        = false -- great-person recruit requested this turn (async)
 local g_inflight    = {}    -- [unitID]=true, an order is ISSUED but not yet resolved.
                             -- The keystone debounce (issue #3): every Request* is
                             -- async, and a queued SKIP/FORTIFY/FOUND_CITY has no
@@ -259,7 +264,12 @@ local function BuildThreatCache(eLocalPlayer, pDiplo, pVis)
 			if ok and units ~= nil then
 				for _, u in units:Members() do
 					if not u:IsDead() and pVis:IsUnitVisible(u) then
-						t[#t + 1] = { x = u:GetX(), y = u:GetY() };
+						-- Domain tag (Anthony: "warriors can't fire on boats"):
+						-- sea threats are unactionable for melee and must not
+						-- drive their wake/defense loops.
+						local ui = GameInfo.Units[u:GetUnitType()];
+						t[#t + 1] = { x = u:GetX(), y = u:GetY(),
+							sea = (ui ~= nil and ui.Domain == "DOMAIN_SEA") };
 					end
 				end
 			end
@@ -269,11 +279,15 @@ local function BuildThreatCache(eLocalPlayer, pDiplo, pVis)
 end
 
 -- Distance from (x,y) to the nearest visible threat; nil if none visible.
-local function NearestThreatDist(threats, x, y)
+-- landOnly=true ignores sea threats -- melee units can't touch boats, so a
+-- barb galley offshore must not drive their wake/stand/flee behavior.
+local function NearestThreatDist(threats, x, y, landOnly)
 	local best = nil;
 	for _, th in ipairs(threats) do
-		local d = Map.GetPlotDistance(x, y, th.x, th.y);
-		if best == nil or d < best then best = d end
+		if not (landOnly and th.sea) then
+			local d = Map.GetPlotDistance(x, y, th.x, th.y);
+			if best == nil or d < best then best = d end
+		end
 	end
 	return best;
 end
@@ -2008,6 +2022,71 @@ local function AutomatePolicies(pPlayer)
 	return true;
 end
 
+-- ---------------------------------------------------------- government ------
+--
+-- Fires ONLY while the game's own CONSIDER_GOVERNMENT_CHANGE blocker is up --
+-- that is the free-change window, so no anarchy risk. All verified in
+-- UI/Screens/GovernmentScreen.lua: gate :859-873 (CanChangeGovernmentAtAll +
+-- not GovernmentChangeMade + IsAllowStrategicCommands), unlock :2334
+-- (IsGovernmentUnlocked(hash)), slots via GameInfo.Government_SlotCounts
+-- :2427-2434, commit :912 pCulture:RequestChangeGovernment(hash).
+local function AutomateGovernment(pPlayer)
+	if g_govDone or not g_govBlocked then return false end
+	local okC, pCulture = pcall(function() return pPlayer:GetCulture(); end);
+	if not okC or pCulture == nil then return false end
+	local okG, canAll = pcall(function() return pCulture:CanChangeGovernmentAtAll(); end);
+	local okM, made   = pcall(function() return pCulture:GovernmentChangeMade(); end);
+	if not okG or canAll ~= true or not okM or made == true then return false end
+
+	local slotTotals = {};
+	for entry in GameInfo.Government_SlotCounts() do
+		slotTotals[entry.GovernmentType] = (slotTotals[entry.GovernmentType] or 0) + (entry.NumSlots or 0);
+	end
+	local best, bestSlots = nil, -1;
+	for row in GameInfo.Governments() do
+		local t = GameInfo.Types[row.GovernmentType];
+		local okU, unlocked = pcall(function() return pCulture:IsGovernmentUnlocked(t.Hash); end);
+		if okU and unlocked == true then
+			local n = slotTotals[row.GovernmentType] or 0;
+			if n > bestSlots then bestSlots, best = n, t end
+		end
+	end
+	if best == nil then return false end
+	local okR, done = pcall(function() return pCulture:RequestChangeGovernment(best.Hash); end);
+	g_govDone = true;
+	Log("government -> %s (%d slots) accepted=%s", tostring(best.Type), bestSlots, tostring(okR and done));
+	return true;
+end
+
+-- --------------------------------------------------------- great people -----
+--
+-- Claims earned great people (ENDTURN_BLOCKING_CLAIM_GREAT_PERSON). Verified
+-- GreatPeoplePopup.lua: timeline :694-708 (Game.GetGreatPeople():GetTimeline(),
+-- entry.Individual/.Claimant), recruit gate :728 CanRecruitPerson, op :886-891.
+local function AutomateGreatPeopleClaim(pPlayer)
+	if g_gpDone then return false end
+	local e = pPlayer:GetID();
+	local okP, pGP = pcall(function() return Game.GetGreatPeople(); end);
+	if not okP or pGP == nil then return false end
+	local okT, timeline = pcall(function() return pGP:GetTimeline(); end);
+	if not okT or timeline == nil then return false end
+	for _, entry in ipairs(timeline) do
+		if entry.Claimant == nil and entry.Individual ~= nil then
+			local okC, can = pcall(function() return pGP:CanRecruitPerson(e, entry.Individual); end);
+			if okC and can == true then
+				local kParameters = {};
+				kParameters[PlayerOperations.PARAM_GREAT_PERSON_INDIVIDUAL_TYPE] = entry.Individual;
+				UI.RequestPlayerOperation(e, PlayerOperations.RECRUIT_GREAT_PERSON, kParameters);
+				g_gpDone = true;
+				local info = GameInfo.GreatPersonIndividuals[entry.Individual];
+				Log("CLAIMING great person %s", tostring(info ~= nil and info.Name or entry.Individual));
+				return true;
+			end
+		end
+	end
+	return false;
+end
+
 -- ------------------------------------------------- city production ----------
 --
 -- Same philosophy as research: the city's own AI already knows what it wants
@@ -2204,10 +2283,30 @@ local function AutomateProduction(pPlayer, threats)
 			-- pumping settlers straight into barbarian hands). Build the
 			-- strongest trainable land unit until the area is clear.
 			local dCity = NearestThreatDist(threats, pCity:GetX(), pCity:GetY());
+			-- CAP (live: 10 warriors ringing St. Petersburg, 1 building, still
+			-- training warriors): a permanent barb camp keeps the threat visible
+			-- forever, so the override must stop once the city HAS defenders --
+			-- 2 nearby is a garrison, not a shortage.
+			local nDefenders = 0;
 			if dCity ~= nil and dCity <= 4 then
+				local okDU, dUnits = pcall(function() return pPlayer:GetUnits(); end);
+				if okDU and dUnits ~= nil then
+					for _, du in dUnits:Members() do
+						if not du:IsDead() and IsCombatUnit(du) and not IsRecon(du)
+						   and Map.GetPlotDistance(du:GetX(), du:GetY(), pCity:GetX(), pCity:GetY()) <= 4 then
+							nDefenders = nDefenders + 1;
+						end
+					end
+				end
+			end
+			if dCity ~= nil and dCity <= 4 and nDefenders < 2 then
+				-- Sea threat -> build RANGED (only thing that can shoot boats
+				-- from land); land threat -> strongest as before.
+				local seaThreat = (NearestThreatDist(threats, pCity:GetX(), pCity:GetY(), true) == nil);
 				local best = nil;
 				for row in GameInfo.Units() do
 					if (row.Combat or 0) > 0 and row.Domain == "DOMAIN_LAND"
+					   and (not seaThreat or (row.RangedCombat or 0) > 0)
 					   and row.PromotionClass ~= "PROMOTION_CLASS_RECON"
 					   and CanCityProduce(row.Hash) then
 						if best == nil or (row.Combat or 0) > best.combat then
@@ -2514,6 +2613,8 @@ local function RunAutomation()
 		AutomatePantheon(pPlayer);
 		AutomateReligion(pPlayer);
 		AutomatePolicies(pPlayer);
+		AutomateGovernment(pPlayer);
+		AutomateGreatPeopleClaim(pPlayer);
 	end
 	if g_produce then
 		AutomateProduction(pPlayer, threats);
@@ -2641,7 +2742,9 @@ local function RunAutomation()
 				-- forever -- it would hold pose while barbarians razed the
 				-- suburbs. Fortified is not a reason to ignore a war on the
 				-- doorstep: if a visible enemy is close, wake it and fight.
-				local dT = NearestThreatDist(threats, pUnit:GetX(), pUnit:GetY());
+				-- Melee units only wake for LAND threats -- a galley offshore
+				-- is unhittable for them (Anthony's boat report).
+				local dT = NearestThreatDist(threats, pUnit:GetX(), pUnit:GetY(), not IsRanged(pUnit));
 				if dT ~= nil and dT <= 3 and pUnit:GetMovesRemaining() > 0
 				   and not g_woken[id] and why ~= "order-in-flight" then
 					-- Once per turn: this branch bypasses the idle filter by
@@ -2748,6 +2851,8 @@ local function OnLocalPlayerTurnBegin()
 	g_pantheonDone   = false;
 	g_religionDone   = false;
 	g_policyDone     = false;
+	g_govDone        = false;
+	g_gpDone         = false;
 	g_builderIdleLastTurn = g_builderIdleThisTurn;
 	g_builderIdleThisTurn = false;
 	local e = Game.GetLocalPlayer();
@@ -2805,6 +2910,10 @@ local function OnEndTurnBlockingChanged(ePrev, eNew)
 		g_religionDone = false;
 	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_FILL_CIVIC_SLOT then
 		g_policyDone = false;
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_CONSIDER_GOVERNMENT_CHANGE then
+		g_govBlocked = true; g_govDone = false;
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_CLAIM_GREAT_PERSON then
+		g_gpDone = false;
 	end
 	RequestPass();
 end

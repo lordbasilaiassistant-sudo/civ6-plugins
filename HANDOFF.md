@@ -73,4 +73,8 @@ Turn won't end / needs manual clicks. Diagnosed causes, in likely frequency orde
 5. **Every silent skip must log a reason** — "idle but nothing ordered (N recs, M usable)" style lines found
    3 root causes tonight in minutes each.
 6. Lua file-level locals resolve by declaration order; a later-declared local silently compiles as nil global.
-7. Restart the game to load Lua changes (no hot reload from Mods dir).
+7. Restart the game to load Lua changes cleanly. **CORRECTION (2026-07-17, learned by a
+   Runtime-Error flood): this build DOES hot-reload mod Lua on file change (DebugHotloadCache)
+   — which is WORSE, because it picks up half-written files mid-edit and wires nil handlers.
+   HARD RULE: while a game is running, edit ONLY the repo copy; copy to the (WinApp) Mods dir
+   between sessions, validate, then relaunch.**

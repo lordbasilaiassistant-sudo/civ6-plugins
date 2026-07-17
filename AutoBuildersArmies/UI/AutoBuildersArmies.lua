@@ -2462,6 +2462,40 @@ local function OnUnitDone(player)
 	if player == Game.GetLocalPlayer() then RequestPass(); end
 end
 
+-- ------------------------------------------------------ blocker watchdog ----
+--
+-- THE OBSERVABILITY FIX (Anthony: "I basically shouldn't have to send
+-- screenshots"). The engine can flip a unit to needs-orders without firing any
+-- event we subscribe to -- observed live: builder at 2/2 moves showing UNIT
+-- NEEDS ORDERS while our last read said not-ready-to-move, and no later event
+-- ever re-swept it. The game's OWN end-turn-blocker system is the ground
+-- truth (ActionPanel.lua:612 event, :165 getter), so watch THAT:
+--   * every change of blocker is logged BY NAME -> the outside monitor sees
+--     exactly what the END TURN button sees, screenshot-free;
+--   * a units-type blocker means some unit the sweep thinks is handled is not
+--     -- clear the tasked set and re-sweep (safe now: g_inflight, not
+--     g_tasked, is what prevents double-orders);
+--   * any other blocker re-runs the pass so the matching automation
+--     (research/civic/pantheon/religion/envoy/production) gets another shot.
+local function BlockerName(eType)
+	for k, v in pairs(EndTurnBlockingTypes) do
+		if v == eType then return k end
+	end
+	return tostring(eType);
+end
+
+local function OnEndTurnBlockingChanged(ePrev, eNew)
+	if eNew == nil or eNew == EndTurnBlockingTypes.NO_ENDTURN_BLOCKING then return end
+	local name = BlockerName(eNew);
+	Log("END-TURN BLOCKED by %s", name);
+	if eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_UNITS
+	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_UNIT_NEEDS_ORDERS
+	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_STACKED_UNITS then
+		g_tasked = {};   -- someone we "handled" is not handled; look again at everyone
+	end
+	RequestPass();
+end
+
 -- THE "builder moved and froze" FIX (turn 5, live). One-order-per-unit-per-turn
 -- deadlocks when the order finishes EARLY: builder moves one tile, has 1 move
 -- left, game blocks the turn on UNIT HAS MOVES -- but the unit is already in
@@ -2720,6 +2754,7 @@ function Initialize()
 	Events.UnitOperationsCleared.Add(       Safe("UnitOpsCleared",   OnUnitOpResolved));
 	Events.UnitOperationSegmentComplete.Add(Safe("UnitOpSegment",    OnUnitOpResolved));
 	Events.UnitMoveComplete.Add(            Safe("UnitMoveComplete", OnUnitDone));
+	Events.EndTurnBlockingChanged.Add(      Safe("BlockingChanged",  OnEndTurnBlockingChanged));
 	Events.UnitAddedToMap.Add(              Safe("UnitAddedToMap",   OnUnitAddedToMap));
 	Events.CitySelectionChanged.Add(        Safe("CitySelChanged",   OnCitySelectionChanged));
 

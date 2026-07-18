@@ -81,6 +81,7 @@ local g_defcity     = nil   -- {x,y,name,dist} set each pass: the own city with 
                             -- enemy within CITY_DEFENSE_RADIUS (nil = all safe).
                             -- Read by the combat brain (defense mode) and by
                             -- CompositionVetoes (no settlers while under attack).
+local g_defLogName, g_defLogDist = nil, nil  -- last logged threat (log on change only)
 local g_rallyStuck  = {}    -- [unitID]={x,y,n,holdUntil}: rally attempts issued from
                             -- an unchanged position. 3 strikes -> the rally target is
                             -- unreachable from here (#24: warrior skipped 23 turns);
@@ -888,6 +889,29 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 		end
 	end
 
+	-- 0d) DEFENSE SHELTER (live, Delhi: builders oscillated flee-home -> walk
+	--     back out -> flee again, burning every turn). While a city is under
+	--     threat, unlinked builders near it stay put -- in the city if
+	--     reachable -- until the area clears. Linked builders work on.
+	if not linked and g_defcity ~= nil
+	   and Map.GetPlotDistance(x, y, g_defcity.x, g_defcity.y) <= CITY_DEFENDER_PULL then
+		local herePlot = Map.GetPlot(x, y);
+		if herePlot ~= nil and not herePlot:IsCity() then
+			local home = NearestOwnCityPlot(pPlayer, x, y);
+			if home ~= nil and not (home:GetX() == x and home:GetY() == y) then
+				if MoveTo(pUnit, home:GetX(), home:GetY()) then
+					Log("builder %d: city under threat -> sheltering", pUnit:GetID());
+					return "shelter";
+				end
+			end
+		end
+		if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+			IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+			Log("builder %d: city under threat -> holding in city", pUnit:GetID());
+			return "shelter";
+		end
+	end
+
 	-- 1) Repair a pillaged improvement/road under the builder first.
 	if plot ~= nil and (plot:IsImprovementPillaged() or plot:IsRoutePillaged()) then
 		if CanStart(pUnit, UnitOperationTypes.REPAIR) then
@@ -922,9 +946,13 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 		end
 	end
 
-	-- 3) Otherwise relocate toward the nearest recommended tile.
-	local target = BestBuildTargetPlot(pPlayer, pUnit);
-	if target ~= nil then
+	-- 3) Otherwise relocate toward the nearest recommended tile. A refused
+	--    MOVE_TO blacklists the plot and tries the runner-up IN THE SAME PASS
+	--    (live, Delhi: 3 refused candidates = 3 wasted turns under the old
+	--    one-try-per-turn shape; issue #13).
+	for try = 1, 3 do
+		local target = BestBuildTargetPlot(pPlayer, pUnit);
+		if target == nil then break end
 		local tParams = {
 			[UnitOperationTypes.PARAM_X] = target:GetX(),
 			[UnitOperationTypes.PARAM_Y] = target:GetY(),
@@ -934,12 +962,11 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 			IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tParams);
 			return "move";
 		end
-		-- Path exists but MOVE_TO still refused (observed live: likely the
-		-- destination is occupied). Whatever the reason, this plot is a dead
-		-- end RIGHT NOW -- blacklist it so the next pass elects the runner-up
-		-- instead of skip-looping on the same tile (issue #13 follow-up).
+		-- Dead end RIGHT NOW (occupied destination etc.) -- blacklist so the
+		-- next BestBuildTargetPlot call elects the runner-up immediately.
 		g_plotSkip[target:GetIndex()] = Game.GetCurrentGameTurn() + 3;
-		Log("builder %d: MOVE_TO %d,%d refused -- blacklisting plot", pUnit:GetID(), target:GetX(), target:GetY());
+		Log("builder %d: MOVE_TO %d,%d refused -- blacklisting plot (try %d/3)",
+			pUnit:GetID(), target:GetX(), target:GetY(), try);
 	end
 
 	-- 4) Nothing worth doing: skip so it stops nagging, re-evaluated next turn.
@@ -1763,9 +1790,26 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 				return "defend";
 			end
 		end
+		-- HUNT (live, Delhi: a barb camped 2-3 tiles out for ~15 turns while
+		-- every defender fortified -- branch A never fired because the enemy
+		-- was outside one-turn attack reach, and holding never closed the gap).
+		-- A defender already at the ring steps TOWARD a nearby beatable threat
+		-- so the attack branch can finish it next pass. The DEFENSE_STR_MARGIN
+		-- boost mirrors the melee gate: near-even is acceptable at home.
+		local dHunt = NearestThreatDist(threats, x, y);
+		if dCity <= CITY_DEFENSE_RADIUS and dHunt ~= nil and dHunt <= 4 then
+			if AdvanceToward(pUnit, eLocalPlayer, pDiplo, pVis, myStr + DEFENSE_STR_MARGIN, nil, threats) then
+				Log("unit %d: DEFENDING %s -> hunting raider (%d out)",
+					pUnit:GetID(), tostring(g_defcity.name), dHunt);
+				return "hunt";
+			end
+		end
 		-- At the city or pathless: hold. SKIP first when in contact (fortify is
 		-- a revolving door next to enemies -- the cohesion-gate lesson), fortify
-		-- otherwise for the defense bonus.
+		-- otherwise for the defense bonus. Logged (rule #5): this hold was
+		-- invisible and swallowed the "why no attack" question for a session.
+		Log("unit %d: defend-hold (dCity=%d threat=%s atkLeft=%s)",
+			pUnit:GetID(), dCity, tostring(dHunt), tostring(okAtk and attacksLeft or "?"));
 		local dHere = NearestThreatDist(threats, x, y);
 		if dHere ~= nil and dHere <= 1 then
 			if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
@@ -2724,9 +2768,12 @@ local function RunAutomation()
 				end
 			end
 		end
-		if g_defcity ~= nil then
+		if g_defcity ~= nil
+		   and (g_defLogName ~= g_defcity.name or g_defLogDist ~= g_defcity.dist) then
+			-- Log on CHANGE only: the every-pass repeat was drowning the log.
 			Log("CITY UNDER THREAT: %s (enemy %d out) -- defense mode on",
 				tostring(g_defcity.name), g_defcity.dist);
+			g_defLogName, g_defLogDist = g_defcity.name, g_defcity.dist;
 		end
 	end
 

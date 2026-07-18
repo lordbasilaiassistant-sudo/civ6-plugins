@@ -854,10 +854,31 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 	local plot = Map.GetPlot(x, y);
 
 	-- 0) Survival first (#25, live: builder 851972 sat 9 turns with an enemy
-	--    one tile away and died in place). Scouts retreat, settlers flee home --
-	--    builders now do too.
+	--    one tile away and died in place). Best protection: LINK with a soldier
+	--    sharing the tile (Anthony's tip -- the pair is one stack, the civilian
+	--    is uncapturable while linked; API UnitPanel.lua:416-434 + :2597-2607).
+	--    Already linked -> work normally, the soldier holds with us. Not linked
+	--    and danger close -> link if possible, flee home otherwise.
 	local dT = NearestThreatDist(threats, x, y, true);
-	if dT ~= nil and dT <= BUILDER_FLEE_DIST then
+	local okFm, fmN = pcall(function() return pUnit:GetFormationUnitCount(); end);
+	local linked = (okFm and fmN ~= nil and fmN > 1);
+	if not linked and dT ~= nil and dT <= BUILDER_FLEE_DIST + 2 then
+		local okF, fRes = pcall(function()
+			local b, t = UnitManager.CanStartCommand(pUnit, UnitCommandTypes.ENTER_FORMATION, nil, true);
+			return { can = b, res = t };
+		end);
+		if okF and fRes ~= nil and fRes.can and fRes.res ~= nil
+		   and fRes.res[UnitCommandResults.UNITS] ~= nil and #fRes.res[UnitCommandResults.UNITS] > 0 then
+			local mate = fRes.res[UnitCommandResults.UNITS][1];
+			local tLink = {};
+			tLink[UnitCommandTypes.PARAM_UNIT_PLAYER] = mate.player;
+			tLink[UnitCommandTypes.PARAM_UNIT_ID]     = mate.id;
+			IssueCmd(pUnit, UnitCommandTypes.ENTER_FORMATION, tLink);
+			Log("builder %d: LINKED formation with unit %d (threat %d out)", pUnit:GetID(), mate.id, dT);
+			return "link";
+		end
+	end
+	if not linked and dT ~= nil and dT <= BUILDER_FLEE_DIST then
 		local home = NearestOwnCityPlot(pPlayer, x, y);
 		if home ~= nil and not (home:GetX() == x and home:GetY() == y) then
 			if MoveTo(pUnit, home:GetX(), home:GetY()) then
@@ -959,6 +980,71 @@ local function AutomateSettler(pUnit, pPlayer, threats)
 			return "hold";
 		end
 		return nil;   -- nothing issued -> caller's catch-all takes it
+	end
+
+	-- 0b) FORMATION LINK (Anthony's tip, 2026-07-17): a soldier sharing this
+	--     tile can be linked into a formation -- the pair then moves as ONE
+	--     stack and the settler is never alone again. API verified in the
+	--     install: UnitPanel.lua:416-434 (CanStartCommand ENTER_FORMATION
+	--     nil,true -> UnitCommandResults.UNITS = linkable units on this tile),
+	--     :2597-2607 (PARAM_UNIT_PLAYER + PARAM_UNIT_ID -> RequestCommand).
+	local okF, fRes = pcall(function()
+		local b, t = UnitManager.CanStartCommand(pUnit, UnitCommandTypes.ENTER_FORMATION, nil, true);
+		return { can = b, res = t };
+	end);
+	if okF and fRes ~= nil and fRes.can and fRes.res ~= nil
+	   and fRes.res[UnitCommandResults.UNITS] ~= nil and #fRes.res[UnitCommandResults.UNITS] > 0 then
+		local mate = fRes.res[UnitCommandResults.UNITS][1];
+		local tLink = {};
+		tLink[UnitCommandTypes.PARAM_UNIT_PLAYER] = mate.player;
+		tLink[UnitCommandTypes.PARAM_UNIT_ID]     = mate.id;
+		IssueCmd(pUnit, UnitCommandTypes.ENTER_FORMATION, tLink);
+		Log("settler %d: LINKED formation with unit %d", id, mate.id);
+		return "link";
+	end
+
+	-- 0c) TRAVEL CONTRACT (settler 393218 captured live: it marched a 7-turn
+	--     route alone while every escort was pulled into defending Paris --
+	--     the defense doctrine created the gap, this closes it). Founding on
+	--     the spot is always allowed; TRAVEL requires all-cities-safe AND a
+	--     soldier within 1 tile. Waiting happens inside a city, not in the open.
+	local plan0 = g_settlerPlan[id];
+	if plan0 ~= nil and ux == plan0.x and uy == plan0.y
+	   and CanStart(pUnit, UnitOperationTypes.FOUND_CITY) then
+		IssueOp(pUnit, UnitOperationTypes.FOUND_CITY);
+		g_settlerPlan[id] = nil;
+		Log("settler %d: founding city at %d,%d", id, ux, uy);
+		return "found";
+	end
+	local escorted = false;
+	local okE, ownUnits = pcall(function() return pPlayer:GetUnits(); end);
+	if okE and ownUnits ~= nil then
+		for _, u in ownUnits:Members() do
+			if not u:IsDead() and IsCombatUnit(u) and not IsRecon(u)
+			   and Map.GetPlotDistance(ux, uy, u:GetX(), u:GetY()) <= 1 then
+				escorted = true; break;
+			end
+		end
+	end
+	if g_defcity ~= nil or not escorted then
+		local herePlot = Map.GetPlot(ux, uy);
+		if herePlot ~= nil and not herePlot:IsCity() then
+			local home = NearestOwnCityPlot(pPlayer, ux, uy);
+			if home ~= nil and not (home:GetX() == ux and home:GetY() == uy) then
+				if MoveTo(pUnit, home:GetX(), home:GetY()) then
+					Log("settler %d: %s -> waiting in city", id,
+						g_defcity ~= nil and "city under threat" or "no escort");
+					return "wait";
+				end
+			end
+		end
+		if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+			IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+			Log("settler %d: %s -> holding", id,
+				g_defcity ~= nil and "city under threat" or "no escort");
+			return "wait";
+		end
+		return nil;
 	end
 
 	-- 1) A committed site is only re-examined for danger, never for "a slightly
@@ -1515,6 +1601,47 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 		end
 	end
 
+	-- A2) LINKED ESCORT (Anthony's link tip): in a formation with a civilian
+	--     the CIVILIAN drives the stack -- issuing this soldier a move would
+	--     drag the settler/builder wherever the army brain points. Shoot from
+	--     where we stand (branch A already ran), then hold. Membership test:
+	--     GetFormationUnitCount() > 1 (UnitPanel.lua:2239). When the partner
+	--     is a builder and danger has passed, UNLINK (UNITCOMMAND_EXIT_FORMATION,
+	--     UnitCommands.xml:17) so the soldier rejoins the army; settler links
+	--     persist until the founding dissolves them.
+	local okFm, fmN = pcall(function() return pUnit:GetFormationUnitCount(); end);
+	if okFm and fmN ~= nil and fmN > 1 then
+		local withSettler = false;
+		local okU2, us2 = pcall(function() return Players[eLocalPlayer]:GetUnits(); end);
+		if okU2 and us2 ~= nil then
+			for _, u in us2:Members() do
+				if not u:IsDead() and u:GetX() == x and u:GetY() == y and IsSettler(u) then
+					withSettler = true; break;
+				end
+			end
+		end
+		local dHere = NearestThreatDist(threats, x, y);
+		if not withSettler and (dHere == nil or dHere > 5) then
+			local okX, canX = pcall(function()
+				return UnitManager.CanStartCommand(pUnit, UnitCommandTypes.EXIT_FORMATION, nil, false);
+			end);
+			if okX and canX == true then
+				IssueCmd(pUnit, UnitCommandTypes.EXIT_FORMATION, {});
+				Log("unit %d: threat clear -> UNLINKED from civilian", pUnit:GetID());
+				return "unlink";
+			end
+		end
+		if CanStart(pUnit, UnitOperationTypes.FORTIFY) then
+			IssueOp(pUnit, UnitOperationTypes.FORTIFY);
+			return "linked";
+		end
+		if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+			IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+			return "linked";
+		end
+		return nil;
+	end
+
 	-- B) Wounded and safe -> heal (fortify until healed). Under fire -> RUN:
 	-- an hp=1 warrior sat adjacent to an enemy with no escape branch (live,
 	-- India session) because heal required a clear tile. ScoutRetreat's
@@ -1550,13 +1677,16 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 							end
 						end
 					end
-					if closest and dMe > 1 then
+					if closest and dMe >= 1 then
+						-- Move ONTO the settler's tile: formation linking
+						-- (ENTER_FORMATION) requires sharing it. The settler
+						-- links next pass and the pair marches as one stack.
 						if MoveTo(pUnit, u:GetX(), u:GetY()) then
 							Log("unit %d: escorting settler %d", pUnit:GetID(), u:GetID());
 							return "escort";
 						end
-					elseif closest and dMe <= 1 then
-						break;   -- already adjacent; fall through to fight/hold
+					elseif closest then
+						break;   -- same tile; the settler links the formation
 					end
 				end
 			end

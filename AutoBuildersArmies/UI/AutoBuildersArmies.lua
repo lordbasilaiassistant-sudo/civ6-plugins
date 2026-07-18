@@ -1125,7 +1125,11 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 	local dT = NearestThreatDist(threats, x, y, true);
 	local okFm, fmN = pcall(function() return pUnit:GetFormationUnitCount(); end);
 	local linked = (okFm and fmN ~= nil and fmN > 1);
-	if not linked and dT ~= nil and dT <= BUILDER_FLEE_DIST + 2 then
+	-- LINK EARLY, not at the last second (Anthony live: "units being captured
+	-- again regularly... creating linked formation is a thing in game for this
+	-- reason"). Any land threat within 8 -> take the link the moment a soldier
+	-- shares the tile. Unlink hysteresis lives in the soldier branch (>10).
+	if not linked and dT ~= nil and dT <= 8 then
 		local okF, fRes = pcall(function()
 			local b, t = UnitManager.CanStartCommand(pUnit, UnitCommandTypes.ENTER_FORMATION, nil, true);
 			return { can = b, res = t };
@@ -1246,6 +1250,13 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 			-- claim ledger, so two builders kept electing the same plot.
 			g_claims[target:GetIndex()] = pUnit:GetID();
 			IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tParams);
+			return "move";
+		end
+		-- Direct MOVE_TO refused: give the full MoveTo wrapper a shot BEFORE
+		-- blacklisting -- its bare-params retry and greedy-leg fallback are
+		-- exactly what the engine's far-move refusals need (live 2026-07-18
+		-- evening: 3/3 candidates refused per builder per turn, builders idled).
+		if MoveTo(pUnit, target:GetX(), target:GetY()) then
 			return "move";
 		end
 		-- Dead end RIGHT NOW (occupied destination etc.) -- blacklist so the
@@ -2178,8 +2189,10 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 				end
 			end
 		end
+		-- Hysteresis (link at <=8, release only past 10): the old release-at->5
+		-- fought the link gate and flapped the pair in the 5-8 band.
 		local dHere = NearestThreatDist(threats, x, y);
-		if not withSettler and (dHere == nil or dHere > 5) then
+		if not withSettler and (dHere == nil or dHere > 10) then
 			local okX, canX = pcall(function()
 				return UnitManager.CanStartCommand(pUnit, UnitCommandTypes.EXIT_FORMATION, nil, false);
 			end);
@@ -2232,7 +2245,23 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	local okS, units = pcall(function() return pP:GetUnits(); end);
 	if okS and units ~= nil and not defending then
 		for _, u in units:Members() do
-			if not u:IsDead() and IsSettler(u) then
+			-- Escort UNLINKED civilians: settlers always; builders when danger
+			-- is near them (Anthony: captures keep happening -- the shield must
+			-- be DELIVERED, not hoped for). A linked civilian needs nothing.
+			local isWard = false;
+			if not u:IsDead() then
+				local okFmW, fmW = pcall(function() return u:GetFormationUnitCount(); end);
+				local uLinked = (okFmW and fmW ~= nil and fmW > 1);
+				if not uLinked then
+					if IsSettler(u) then
+						isWard = true;
+					elseif IsBuilder(u) then
+						local dW = NearestThreatDist(threats, u:GetX(), u:GetY(), true);
+						isWard = (dW ~= nil and dW <= 8);
+					end
+				end
+			end
+			if isWard then
 				local dMe = Map.GetPlotDistance(x, y, u:GetX(), u:GetY());
 				if dMe <= 6 then
 					local closest = true;
@@ -2245,15 +2274,15 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 						end
 					end
 					if closest and dMe >= 1 then
-						-- Move ONTO the settler's tile: formation linking
-						-- (ENTER_FORMATION) requires sharing it. The settler
-						-- links next pass and the pair marches as one stack.
+						-- Move ONTO the civilian's tile: formation linking
+						-- (ENTER_FORMATION) requires sharing it. The civilian
+						-- links next pass and the pair moves as one stack.
 						if MoveTo(pUnit, u:GetX(), u:GetY()) then
-							Log("unit %d: escorting settler %d", pUnit:GetID(), u:GetID());
+							Log("unit %d: escorting civilian %d", pUnit:GetID(), u:GetID());
 							return "escort";
 						end
 					elseif closest then
-						break;   -- same tile; the settler links the formation
+						break;   -- same tile; the civilian links the formation
 					end
 				end
 			end

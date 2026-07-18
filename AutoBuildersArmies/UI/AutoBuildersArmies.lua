@@ -102,6 +102,23 @@ local g_districtNoPlot = {}   -- ["cityID:hash"]=true, district had no legal plo
 local g_envoyDone   = false -- envoys dumped this turn. GetTokensToGive does not
                             -- update until the async op lands, so a second pass in
                             -- the same turn would spend tokens we no longer have.
+local g_upgraded  = {}      -- [unitID]=true, upgrade requested this turn (async, #30)
+local g_upgradeCount = 0    -- upgrades issued this turn (budget cap)
+local g_cityBought = {}     -- [cityID]=true, emergency gold-buy issued this turn.
+                            -- PURCHASE is async and CanStartCommand stays true
+                            -- until it lands -- a re-pass double-fired = double
+                            -- gold spend (audit #12). Reset ONLY at TurnBegin.
+local g_researchDone = false -- research/civic requested this turn (async, like
+local g_civicDone    = false -- g_envoyDone); re-armed by their blockers.
+local g_envoyLastTokens = -1 -- token count at our last envoy volley: the getter
+                             -- is stale until the async ops land, so the same
+                             -- count re-appearing means "still processing",
+                             -- not "new tokens" (audit #29).
+local g_blkLogged = {}      -- [blockerName]=fires this turn (log dedupe #33)
+local g_struck    = {}      -- ["c<id>"/"d<id>"]=true, city/district strike fired this
+                            -- turn (#29). CanStartCommand goes false only when the
+                            -- async request RESOLVES, so a same-pass re-ask would
+                            -- double-fire without this.
 local g_logOnce   = {}      -- [key]=true, log lines already emitted this turn (#33:
                             -- the pass runs on every PublishComplete, so any per-pass
                             -- Log with no debounce prints hundreds of copies -- live:
@@ -360,6 +377,7 @@ local function MoveTo(pUnit, x, y)
 		[UnitOperationTypes.PARAM_Y] = y,
 	};
 	if CanStart(pUnit, UnitOperationTypes.MOVE_TO, tBare) then
+		g_claims[claimKey] = pUnit:GetID();   -- audit #3: this accept path claimed nothing
 		IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tBare);
 		Log("unit %d: MOVE_TO %d,%d accepted only without modifiers", pUnit:GetID(), x, y);
 		return true;
@@ -451,22 +469,22 @@ local function EnsureOrdered(pUnit, why, retryNextTurn)
 
 	if retryNextTurn and CanStart(pUnit, opSkip) then
 		IssueOp(pUnit,opSkip);
-		Log("UNSTUCK %s %d: %s -> skip (retry next turn)", uType, id, why);
+		LogOnce("unstuck:" .. id, "UNSTUCK %s %d: %s -> skip (retry next turn)", uType, id, why);
 		return true;
 	end
 	if CanStart(pUnit, opFortify) then
 		IssueOp(pUnit,opFortify);
-		Log("UNSTUCK %s %d: %s -> fortify", uType, id, why);
+		LogOnce("unstuck:" .. id, "UNSTUCK %s %d: %s -> fortify", uType, id, why);
 		return true;
 	end
 	if CanStart(pUnit, opSleep) then
 		IssueOp(pUnit,opSleep);
-		Log("UNSTUCK %s %d: %s -> sleep (NO AUTOMATION FOR THIS CLASS -- automate it next)", uType, id, why);
+		LogOnce("unstuck:" .. id, "UNSTUCK %s %d: %s -> sleep (NO AUTOMATION FOR THIS CLASS -- automate it next)", uType, id, why);
 		return true;
 	end
 	if CanStart(pUnit, opSkip) then
 		IssueOp(pUnit,opSkip);
-		Log("UNSTUCK %s %d: %s -> skip", uType, id, why);
+		LogOnce("unstuck:" .. id, "UNSTUCK %s %d: %s -> skip", uType, id, why);
 		return true;
 	end
 	-- Deep-wedge levers (issue #14, warrior 131073 live): a unit the engine
@@ -578,6 +596,49 @@ local function TryPromote(pUnit)
 	local info = GameInfo.UnitPromotions[ePromotion];
 	Log("promote unit %d -> %s (%d offered)", id,
 		(info ~= nil and info.UnitPromotionType) or tostring(ePromotion), #list);
+	return true;
+end
+
+-- -------------------------------------------------------------- upgrades ----
+--
+-- Warrior -> Swordsman and every other UnitUpgrades row (#30, Anthony:
+-- "upgrading units to their next tier"). The engine gates EVERYTHING inside
+-- the strict CanStartCommand (gold, friendly territory, target tech, XP2
+-- strategic resources) -- we only add a treasury reserve so upgrades never
+-- starve the emergency defense gold-buy, and a per-turn cap so one rich turn
+-- does not blow the whole bank.
+-- API verified (UnitPanel.lua:466-484 two-stage check + GetUpgradeCost;
+-- :2511-2513 RequestCommand with NO params; UnitUpgrades table
+-- 01_GameplaySchema.sql:3076, e.g. Units.xml:856 WARRIOR->SWORDSMAN).
+local UPGRADE_GOLD_RESERVE  = 200;
+local MAX_UPGRADES_PER_TURN = 3;
+
+local function TryUpgrade(pUnit, pPlayer)
+	local id = pUnit:GetID();
+	if g_upgraded[id] or g_promoted[id] then return false end
+	if g_upgradeCount >= MAX_UPGRADES_PER_TURN then return false end
+	if g_inflight[id] then return false end
+	local ok, can = pcall(function()
+		return UnitManager.CanStartCommand(pUnit, UnitCommandTypes.UPGRADE, false);
+	end);
+	if not ok or not can then return false end
+	local okC, cost = pcall(function() return pUnit:GetUpgradeCost(); end);
+	if not okC or cost == nil then return false end
+	local okT, bal = pcall(function() return pPlayer:GetTreasury():GetGoldBalance(); end);
+	if not okT or bal == nil or (bal - cost) < UPGRADE_GOLD_RESERVE then return false end
+	local newType = "?";
+	local okR, res = pcall(function()
+		local _, t = UnitManager.CanStartCommand(pUnit, UnitCommandTypes.UPGRADE, false, true);
+		return t;
+	end);
+	if okR and res ~= nil and res[UnitCommandResults.UNIT_TYPE] ~= nil then
+		local r = GameInfo.Units[res[UnitCommandResults.UNIT_TYPE]];
+		if r ~= nil then newType = r.UnitType end
+	end
+	g_upgraded[id]  = true;
+	g_upgradeCount  = g_upgradeCount + 1;
+	IssueCmd(pUnit, UnitCommandTypes.UPGRADE, nil);
+	Log("UPGRADING unit %d -> %s (cost %d, bank %d)", id, newType, cost, math.floor(bal));
 	return true;
 end
 
@@ -743,7 +804,110 @@ local function StrongestAdjacentEnemy(x, y, eLocalPlayer, pDiplo, pVis)
 	return maxStr;
 end
 
+-- ---------------------------------------------------------- city strikes ----
+--
+-- Walled cities and encampments get a FREE ranged shot every turn, and the mod
+-- never fired one (#29 -- Anthony watched the CITY RANGED ATTACK button sit
+-- unused mid-invasion). API verified in the install:
+--   gate     CityManager.CanStartCommand(cityOrDistrict, RANGE_ATTACK) with no
+--            params = "can strike at all this turn" (CityBannerManager.lua:1555)
+--   targets  CityManager.GetCommandTargets -> PLOTS + MODIFIERS, real target
+--            iff MODIFIER_IS_TARGET (WorldInput.lua:2579-2587)
+--   fire     PARAM_X/PARAM_Y (UnitOperationTypes' params, deliberately --
+--            WorldInput.lua:2549-2556); districts identical (:2626-2650).
+local function StrikeFrom(obj, what, eLocalPlayer, pDiplo, pVis)
+	local okG, canAny = pcall(function()
+		return CityManager.CanStartCommand(obj, CityCommandTypes.RANGE_ATTACK);
+	end);
+	if not okG or not canAny then return false end
+	local okT, tResults = pcall(function()
+		return CityManager.GetCommandTargets(obj, CityCommandTypes.RANGE_ATTACK, {});
+	end);
+	if not okT or tResults == nil then return false end
+	local plots = tResults[CityCommandResults.PLOTS];
+	local mods  = tResults[CityCommandResults.MODIFIERS];
+	if plots == nil or mods == nil then return false end
+	local best, bestScore = nil, -1;
+	for i, m in ipairs(mods) do
+		if m == CityCommandResults.MODIFIER_IS_TARGET then
+			local plot = Map.GetPlotByIndex(plots[i]);
+			if plot ~= nil then
+				-- Same focus-fire doctrine as the units (#6): kill-shots first.
+				local score = 1;
+				local e = GetEnemyOnPlot(plot, eLocalPlayer, pDiplo, pVis);
+				if e ~= nil then
+					score = 200 - HPPercent(e);
+					if HPPercent(e) <= 35 then score = score + 200 end
+				end
+				if score > bestScore then bestScore, best = score, plot end
+			end
+		end
+	end
+	if best == nil then return false end
+	local tParams = {
+		[UnitOperationTypes.PARAM_X] = best:GetX(),
+		[UnitOperationTypes.PARAM_Y] = best:GetY(),
+	};
+	local okC, can = pcall(function()
+		return CityManager.CanStartCommand(obj, CityCommandTypes.RANGE_ATTACK, tParams);
+	end);
+	if not (okC and can) then return false end
+	CityManager.RequestCommand(obj, CityCommandTypes.RANGE_ATTACK, tParams);
+	Log("CITY-STRIKE from [%s] -> %d,%d", tostring(what), best:GetX(), best:GetY());
+	return true;
+end
+
+local function AutomateCityStrikes(pPlayer, eLocalPlayer, pDiplo, pVis)
+	local okC, cities = pcall(function() return pPlayer:GetCities(); end);
+	if okC and cities ~= nil then
+		for _, c in cities:Members() do
+			local key = "c" .. c:GetID();
+			if not g_struck[key] and StrikeFrom(c, c:GetName(), eLocalPlayer, pDiplo, pVis) then
+				g_struck[key] = true;
+			end
+		end
+	end
+	-- Encampments etc. -- pcall-fenced as a unit: if this build's district
+	-- collection has no Members(), cities above still fired.
+	pcall(function()
+		local dists = pPlayer:GetDistricts();
+		if dists == nil then return end
+		for _, d in dists:Members() do
+			local key = "d" .. d:GetID();
+			if not g_struck[key] and StrikeFrom(d, "district " .. d:GetID(), eLocalPlayer, pDiplo, pVis) then
+				g_struck[key] = true;
+			end
+		end
+	end);
+end
+
 -- ------------------------------------------------------------- builders -----
+
+-- Is this plot improved WRONG for the resource under it? (Anthony 2026-07-18:
+-- "redo things if a diff strat resource is there" -- iron revealed under an
+-- old farm needs that farm replaced with a mine.) Validity map built once from
+-- Improvement_ValidResources, the same table the plot tooltip walks.
+local g_resImpValid = nil;   -- [ResourceType string][improvement Index] = true
+local function WrongImprovementForResource(plot)
+	local resIdx = plot:GetResourceType();
+	local impIdx = plot:GetImprovementType();
+	if resIdx == -1 or impIdx == -1 then return false end
+	if g_resImpValid == nil then
+		g_resImpValid = {};
+		for row in GameInfo.Improvement_ValidResources() do
+			local imp = GameInfo.Improvements[row.ImprovementType];
+			if imp ~= nil then
+				g_resImpValid[row.ResourceType] = g_resImpValid[row.ResourceType] or {};
+				g_resImpValid[row.ResourceType][imp.Index] = true;
+			end
+		end
+	end
+	local resRow = GameInfo.Resources[resIdx];
+	if resRow == nil then return false end
+	local valid = g_resImpValid[resRow.ResourceType];
+	if valid == nil then return false end   -- resource takes no improvement: leave it
+	return valid[impIdx] ~= true;
+end
 
 -- Nearest reachable, unimproved tile the game recommends improving.
 local function BestBuildTargetPlot(pPlayer, pUnit)
@@ -844,7 +1008,8 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 				   -- always have things to do"): at war the map fills with
 				   -- pillaged farms, repair is charge-FREE, and the old
 				   -- unimproved-only filter made them invisible to the scan.
-				   and (plot:GetImprovementType() == -1 or plot:IsImprovementPillaged())
+				   and (plot:GetImprovementType() == -1 or plot:IsImprovementPillaged()
+				        or WrongImprovementForResource(plot))
 				   and plot:GetDistrictType() == -1
 				   and not plot:IsCity()
 				   and (g_plotSkip[plot:GetIndex()] == nil or g_plotSkip[plot:GetIndex()] <= nowTurn)
@@ -858,6 +1023,8 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 						if resName ~= nil then score = score + 100 end
 						-- Repairs outrank new builds: instant yield back, no charge.
 						if plot:IsImprovementPillaged() then score = score + 150 end
+						-- Mis-improved resource plots (farm on iron) rank just below.
+						if WrongImprovementForResource(plot) then score = score + 120 end
 						for yRow in GameInfo.Yields() do
 							local okY, y = pcall(function() return plot:GetYield(yRow.Index); end);
 							if okY and y ~= nil then score = score + y end
@@ -977,16 +1144,33 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 		g_plotSkip[plot:GetIndex()] = Game.GetCurrentGameTurn() + 5;
 	end
 
-	-- 2) Build the engine's recommended improvement on the current (unimproved) tile.
-	if plot ~= nil and plot:GetImprovementType() == -1 then
+	-- 2) Build the engine's recommended improvement on the current tile --
+	--    unimproved, OR mis-improved over a resource (farm on revealed iron).
+	if plot ~= nil and (plot:GetImprovementType() == -1 or WrongImprovementForResource(plot)) then
 		local tParams = { [UnitOperationTypes.PARAM_X] = x, [UnitOperationTypes.PARAM_Y] = y };
 		local ok, res = UnitManager.CanStartOperation(pUnit, UnitOperationTypes.BUILD_IMPROVEMENT, nil, tParams, true);
 		if not (ok and res ~= nil and res[UnitOperationResults.IMPROVEMENTS] ~= nil and #res[UnitOperationResults.IMPROVEMENTS] > 0) then
-			-- Standing on an unimproved tile with NOTHING legal to build: the
-			-- scan liked this plot but the game disagrees (usually a missing
-			-- tech the resource filter could not see -- features, appeal rules).
-			-- Blacklist it briefly so the next pick is a DIFFERENT plot instead
-			-- of shuttling back here every pass (issue #9).
+			-- Nothing buildable here. CHOP/HARVEST before giving up (Anthony:
+			-- "builders can remove rainforests and marsh too"): REMOVE_FEATURE
+			-- clears jungle/marsh/woods for future builds and pays instant
+			-- yields to the city; HARVEST_RESOURCE cashes a bonus resource.
+			-- Both engine-gated by tech, both verified UnitOperations.xml:82/94.
+			local opChop = ResolveOp(UnitOperationTypes.REMOVE_FEATURE, "UNITOPERATION_REMOVE_FEATURE");
+			if CanStart(pUnit, opChop) then
+				IssueOp(pUnit, opChop);
+				Log("builder %d: REMOVING FEATURE at %d,%d", pUnit:GetID(), x, y);
+				return "chop";
+			end
+			local opHarv = ResolveOp(UnitOperationTypes.HARVEST_RESOURCE, "UNITOPERATION_HARVEST_RESOURCE");
+			if CanStart(pUnit, opHarv) then
+				IssueOp(pUnit, opHarv);
+				Log("builder %d: HARVESTING resource at %d,%d", pUnit:GetID(), x, y);
+				return "harvest";
+			end
+			-- Truly nothing: the scan liked this plot but the game disagrees
+			-- (usually a missing tech the resource filter could not see --
+			-- features, appeal rules). Blacklist it briefly so the next pick is
+			-- a DIFFERENT plot instead of shuttling back here (issue #9).
 			g_plotSkip[plot:GetIndex()] = Game.GetCurrentGameTurn() + 5;
 		end
 		if ok and res ~= nil and res[UnitOperationResults.IMPROVEMENTS] ~= nil and #res[UnitOperationResults.IMPROVEMENTS] > 0 then
@@ -1016,6 +1200,9 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 			[UnitOperationTypes.PARAM_MODIFIERS] = UnitOperationMoveModifiers.NONE,
 		};
 		if CanStart(pUnit, UnitOperationTypes.MOVE_TO, tParams) then
+			-- Claim the destination (audit #3): this path bypassed MoveTo's
+			-- claim ledger, so two builders kept electing the same plot.
+			g_claims[target:GetIndex()] = pUnit:GetID();
 			IssueOp(pUnit,UnitOperationTypes.MOVE_TO, tParams);
 			return "move";
 		end
@@ -1027,10 +1214,14 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 	end
 
 	-- 4) Nothing worth doing: skip so it stops nagging, re-evaluated next turn.
+	--    "rest", not "idle" (audit #19): a skip WAS issued, so the caller must
+	--    not ALSO run the catch-all -- that was a double skip plus false
+	--    decline strikes every workless turn.
 	if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
 		IssueOp(pUnit,UnitOperationTypes.SKIP_TURN);
+		return "rest";
 	end
-	return "idle";
+	return nil;
 end
 
 -- -------------------------------------------------------------- settlers ----
@@ -1112,14 +1303,21 @@ local function AutomateSettler(pUnit, pPlayer, threats)
 			end
 		end
 	end
-	if g_defcity ~= nil or not escorted then
+	-- Scope the defense hold to the ACTUAL danger zone (audit #6): the old
+	-- blanket g_defcity test froze every settler empire-wide whenever any city
+	-- anywhere saw a barbarian -- a war on another continent must not stall
+	-- expansion here. CITY_DEFENDER_PULL keeps this congruent with the zone
+	-- whose escorts get recalled.
+	local nearDef = (g_defcity ~= nil
+		and Map.GetPlotDistance(ux, uy, g_defcity.x, g_defcity.y) <= CITY_DEFENDER_PULL);
+	if nearDef or not escorted then
 		local herePlot = Map.GetPlot(ux, uy);
 		if herePlot ~= nil and not herePlot:IsCity() then
 			local home = NearestOwnCityPlot(pPlayer, ux, uy);
 			if home ~= nil and not (home:GetX() == ux and home:GetY() == uy) then
 				if MoveTo(pUnit, home:GetX(), home:GetY()) then
 					Log("settler %d: %s -> waiting in city", id,
-						g_defcity ~= nil and "city under threat" or "no escort");
+						nearDef and "city under threat" or "no escort");
 					return "wait";
 				end
 			end
@@ -1127,7 +1325,7 @@ local function AutomateSettler(pUnit, pPlayer, threats)
 		if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
 			IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
 			Log("settler %d: %s -> holding", id,
-				g_defcity ~= nil and "city under threat" or "no escort");
+				nearDef and "city under threat" or "no escort");
 			return "wait";
 		end
 		LogOnce("setwait:" .. id, "settler %d: wait wanted, MOVE_TO home AND skip both refused", id);
@@ -1294,6 +1492,13 @@ local function AutomateTrader(pUnit, pPlayer)
 		local okC, cap     = pcall(function() return pTrade:GetOutgoingRouteCapacity(); end);
 		if okN and okC and nRoutes ~= nil and cap ~= nil and nRoutes >= cap then
 			LogOnce("tradercap:" .. id, "trader %d: at route capacity (%d/%d)", id, nRoutes, cap);
+			-- Skip in place (audit #23). NOT sleep: a slept trader never reads
+			-- AWAKE again, so it would miss capacity growth forever. NOT nil:
+			-- the catch-all churned an UNSTUCK line for it every single turn.
+			if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+				IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+				return "capacity";
+			end
 			return nil;
 		end
 	end
@@ -1376,6 +1581,21 @@ local function AutomateGreatPerson(pUnit, pPlayer, gp)
 	local cls = GameInfo.GreatPersonClasses[gp:GetClass()];
 	local clsName = (cls ~= nil) and cls.GreatPersonClassType or "?";
 
+	-- PROPHETS use a different verb entirely (audit 2026-07-18, the x23 churn):
+	-- the unit OPERATION FOUND_RELIGION (UnitOperations.xml:81; GreatPeople.xml:24
+	-- ActionIcon=ICON_UNITOPERATION_FOUND_RELIGION). ACTIVATE_GREAT_PERSON is
+	-- never legal for them. CanStart is false until the prophet stands on a
+	-- completed Holy Site/Stonehenge -- the plot walk below gets it there.
+	if clsName == "GREAT_PERSON_CLASS_PROPHET" then
+		local opFound = ResolveOp(UnitOperationTypes.FOUND_RELIGION, "UNITOPERATION_FOUND_RELIGION");
+		if CanStart(pUnit, opFound) then
+			IssueOp(pUnit, opFound);
+			g_gpStrikes[id] = nil;
+			Log("great person %d (PROPHET): FOUND_RELIGION at %d,%d", id, pUnit:GetX(), pUnit:GetY());
+			return "activate";
+		end
+	end
+
 	local ok, plots = pcall(function() return gp:GetActivationHighlightPlots(); end);
 	if not ok or plots == nil or #plots == 0 then
 		-- Nowhere to activate yet (e.g. prophet before any Holy Site exists).
@@ -1387,8 +1607,12 @@ local function AutomateGreatPerson(pUnit, pPlayer, gp)
 	local here = Map.GetPlotIndex(pUnit:GetX(), pUnit:GetY());
 	for _, idx in ipairs(plots) do
 		if idx == here then
+			-- STRICT gate, arg3=false = "can it RIGHT NOW" (UnitPanel.lua:471).
+			-- The old loose-check (arg3=true) is why the command was requested
+			-- into a wall 43x: standing on a highlight plot is necessary, NOT
+			-- sufficient (the highlight is lens decoration, SelectedUnit.lua:129).
 			local okC, can = pcall(function()
-				return UnitManager.CanStartCommand(pUnit, UnitCommandTypes.ACTIVATE_GREAT_PERSON, true);
+				return UnitManager.CanStartCommand(pUnit, UnitCommandTypes.ACTIVATE_GREAT_PERSON, false);
 			end);
 			if okC and can then
 				IssueCmd(pUnit, UnitCommandTypes.ACTIVATE_GREAT_PERSON, nil);
@@ -1396,14 +1620,28 @@ local function AutomateGreatPerson(pUnit, pPlayer, gp)
 				Log("great person %d (%s): ACTIVATING at %d,%d", id, clsName, pUnit:GetX(), pUnit:GetY());
 				return "activate";
 			end
-			-- On the plot, command refused (live: Writer x43, Prophet x23 -- the
-			-- churn was a whole session long). Structural refusals (no empty
-			-- great-work slot, class needs a different command) do not clear by
-			-- retrying, so 3 strikes -> SLEEP. Any finished city build resets the
-			-- strikes and WAKES sleeping GPs (slots arrive with buildings).
+			-- Refused: name WHY (the engine ships the reason -- e.g. Writers with
+			-- no empty great-work slot, InGameText.xml:3015). Command results are
+			-- read via UnitOperationResults.FAILURE_REASONS, the game's own
+			-- pattern (UnitPanel.lua:522-529).
+			local reasons = "";
+			local okR, tRes = pcall(function()
+				local _, t = UnitManager.CanStartCommand(pUnit, UnitCommandTypes.ACTIVATE_GREAT_PERSON, false, true);
+				return t;
+			end);
+			if okR and tRes ~= nil and tRes[UnitOperationResults.FAILURE_REASONS] ~= nil then
+				for _, s in ipairs(tRes[UnitOperationResults.FAILURE_REASONS]) do
+					local okL, txt = pcall(function() return Locale.Lookup(s); end);
+					reasons = reasons .. " | " .. tostring(okL and txt or s);
+				end
+			end
+			-- Structural refusals do not clear by retrying: 3 strikes -> SLEEP.
+			-- Any finished city build resets strikes and WAKES sleeping GPs
+			-- (slots arrive with buildings).
 			local n = (g_gpStrikes[id] or 0) + 1;
 			g_gpStrikes[id] = n;
-			LogOnce("gprefuse:" .. id, "great person %d (%s): on activation plot but command refused (strike %d)", id, clsName, n);
+			LogOnce("gprefuse:" .. id, "great person %d (%s): on plot, refused (strike %d)%s", id, clsName, n,
+				reasons ~= "" and reasons or " | no reason given");
 			if n >= 3 then
 				local opSleep = ResolveOp(UnitOperationTypes.SLEEP, "UNITOPERATION_SLEEP");
 				if CanStart(pUnit, opSleep) then
@@ -1708,6 +1946,12 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	local okAtk, attacksLeft = pcall(function() return pUnit:GetAttacksRemaining() end);
 	local canAttack = (not okAtk) or attacksLeft == nil or attacksLeft > 0;
 
+	-- Linked state, computed ONCE (audit #7): a linked soldier's melee charge
+	-- MOVES the stack -- it dragged the settler/builder into the fight the
+	-- formation exists to shield it from.
+	local okFm, fmN = pcall(function() return pUnit:GetFormationUnitCount(); end);
+	local isLinked = (okFm and fmN ~= nil and fmN > 1);
+
 	-- Branch on unit class INSIDE the attack gate: `ranged and canAttack ...
 	-- else melee` would drop a ranged unit that had already fired into the
 	-- melee branch and charge it into the enemy it just shot at.
@@ -1721,7 +1965,7 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 					return "range";
 				end
 			end
-		else
+		elseif not isLinked then
 			local target = BestMeleeTarget(pUnit, eLocalPlayer, pDiplo, pVis, myStr,
 				defending and DEFENSE_STR_MARGIN or 0);
 			if target ~= nil then
@@ -1746,8 +1990,7 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	--     is a builder and danger has passed, UNLINK (UNITCOMMAND_EXIT_FORMATION,
 	--     UnitCommands.xml:17) so the soldier rejoins the army; settler links
 	--     persist until the founding dissolves them.
-	local okFm, fmN = pcall(function() return pUnit:GetFormationUnitCount(); end);
-	if okFm and fmN ~= nil and fmN > 1 then
+	if isLinked then
 		local withSettler = false;
 		local okU2, us2 = pcall(function() return Players[eLocalPlayer]:GetUnits(); end);
 		if okU2 and us2 ~= nil then
@@ -1876,8 +2119,16 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 			local st = g_rallyStuck[id];
 			if st ~= nil and (st.x ~= x or st.y ~= y) then st = nil; g_rallyStuck[id] = nil end
 			if st ~= nil and st.n >= 3 and turn < st.holdUntil then
-				Log("unit %d: rally unreachable from %d,%d (3 strikes) -> holding until t%d",
+				LogOnce("rallyhold:" .. id,
+					"unit %d: rally unreachable from %d,%d (3 strikes) -> holding until t%d",
 					id, x, y, st.holdUntil);
+				-- SKIP, not the fortify below (audit #26): a fortified unit stops
+				-- reading AWAKE, so the "10-turn hold" never actually ended --
+				-- the unit vanished from the sweep permanently.
+				if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+					IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+					return "hold";
+				end
 				-- fall through to fortify/muster below
 			elseif MoveTo(pUnit, rally.x, rally.y) then
 				if st == nil then st = { x = x, y = y, n = 0, holdUntil = 0 }; g_rallyStuck[id] = st end
@@ -1902,25 +2153,26 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	--     the rally/advance behaviour entirely while a city is under threat.
 	if defending then
 		local dCity = Map.GetPlotDistance(x, y, g_defcity.x, g_defcity.y);
+		-- HUNT FIRST (audit #25 oscillation fix): converge used to run before
+		-- this, and MoveTo(city) always succeeded at dCity>1 -- so every hunt
+		-- step got yanked straight back to the city next pass and a mobile
+		-- raider was never pinned. Land threats only: melee cannot hunt boats.
+		-- (Original hunt rationale -- Delhi, barb camped 2-3 out for ~15 turns
+		-- while every defender fortified. DEFENSE_STR_MARGIN mirrors the melee
+		-- gate: near-even is acceptable at home.)
+		local dHunt = NearestThreatDist(threats, x, y, not IsRanged(pUnit));
+		if dHunt ~= nil and dHunt <= 4 then
+			if AdvanceToward(pUnit, eLocalPlayer, pDiplo, pVis, myStr + DEFENSE_STR_MARGIN, nil, threats) then
+				Log("unit %d: DEFENDING %s -> hunting raider (%d out)",
+					pUnit:GetID(), tostring(g_defcity.name), dHunt);
+				return "hunt";
+			end
+		end
 		if dCity > 1 then
 			if MoveTo(pUnit, g_defcity.x, g_defcity.y) then
 				Log("unit %d: DEFENDING %s -> converging (%d tiles out)",
 					pUnit:GetID(), tostring(g_defcity.name), dCity);
 				return "defend";
-			end
-		end
-		-- HUNT (live, Delhi: a barb camped 2-3 tiles out for ~15 turns while
-		-- every defender fortified -- branch A never fired because the enemy
-		-- was outside one-turn attack reach, and holding never closed the gap).
-		-- A defender already at the ring steps TOWARD a nearby beatable threat
-		-- so the attack branch can finish it next pass. The DEFENSE_STR_MARGIN
-		-- boost mirrors the melee gate: near-even is acceptable at home.
-		local dHunt = NearestThreatDist(threats, x, y);
-		if dCity <= CITY_DEFENSE_RADIUS and dHunt ~= nil and dHunt <= 4 then
-			if AdvanceToward(pUnit, eLocalPlayer, pDiplo, pVis, myStr + DEFENSE_STR_MARGIN, nil, threats) then
-				Log("unit %d: DEFENDING %s -> hunting raider (%d out)",
-					pUnit:GetID(), tostring(g_defcity.name), dHunt);
-				return "hunt";
 			end
 		end
 		-- At the city or pathless: hold. SKIP first when in contact (fortify is
@@ -2020,6 +2272,8 @@ local function ChooseFromRecommendations(recs, isLegalHash, getHash, getScore)
 end
 
 local function AutomateResearch(pPlayer)
+	if g_researchDone then return false end   -- request is async (audit #32:
+	                                          -- re-logged/re-requested per pass)
 	local pTechs = pPlayer:GetTechs();
 	if pTechs == nil then return false end
 	if pTechs:GetResearchingTech() ~= -1 then return false end   -- already busy
@@ -2050,10 +2304,12 @@ local function AutomateResearch(pPlayer)
 	tParameters[PlayerOperations.PARAM_TECH_TYPE]   = hash;
 	tParameters[PlayerOperations.PARAM_INSERT_MODE] = PlayerOperations.VALUE_EXCLUSIVE;
 	UI.RequestPlayerOperation(Game.GetLocalPlayer(), PlayerOperations.RESEARCH, tParameters);
+	g_researchDone = true;
 	return true;
 end
 
 local function AutomateCivics(pPlayer)
+	if g_civicDone then return false end   -- async, same as research
 	local pCulture = pPlayer:GetCulture();
 	if pCulture == nil then return false end
 	if pCulture:GetProgressingCivic() ~= -1 then return false end   -- already busy
@@ -2084,6 +2340,7 @@ local function AutomateCivics(pPlayer)
 	tParameters[PlayerOperations.PARAM_CIVIC_TYPE]  = hash;
 	tParameters[PlayerOperations.PARAM_INSERT_MODE] = PlayerOperations.VALUE_EXCLUSIVE;
 	UI.RequestPlayerOperation(Game.GetLocalPlayer(), PlayerOperations.PROGRESS_CIVIC, tParameters);
+	g_civicDone = true;
 	return true;
 end
 
@@ -2118,6 +2375,13 @@ local function AutomateEnvoys(pPlayer)
 	if not okC or canGive ~= true then return false end
 	local okT, tokens = pcall(function() return inf:GetTokensToGive(); end);
 	if not okT or tokens == nil or tokens <= 0 then return false end
+
+	-- Re-entry with the SAME count we just volleyed = the getter is stale (our
+	-- async gives have not landed) or the engine is silently refusing -- either
+	-- way, NOT new tokens (audit #29). Bail withOUT setting g_envoyDone so a
+	-- later pass acts once the count actually moves.
+	if tokens == g_envoyLastTokens then return false end
+	local tokensAtStart = tokens;
 
 	-- Everything below is ASYNC: GetTokensReceived will NOT reflect a token we
 	-- sent a moment ago, so the loop tracks its own sends in `pending`. Without
@@ -2172,7 +2436,10 @@ local function AutomateEnvoys(pPlayer)
 		Log("envoy -> [%s] (%d token(s) left)", tostring(bestName), tokens);
 	end
 
-	if sent > 0 then g_envoyDone = true end
+	if sent > 0 then
+		g_envoyDone = true;
+		g_envoyLastTokens = tokensAtStart;
+	end
 	return sent > 0;
 end
 
@@ -2254,11 +2521,38 @@ local function AutomateReligion(pPlayer)
 	local okE, earned   = pcall(function() return rel:GetNumBeliefsEarned(); end);
 	if not (okP and okT and okE) then return false end
 	if pantheon == nil or pantheon < 0 then return false end
-	if created == nil or created >= 0 then return false end
 	if earned == nil or earned <= 0 then return false end
 
 	local gameRel = Game.GetReligion();
 	if gameRel == nil then return false end
+
+	-- BELIEF-FILL (audit #2): beliefs earned AFTER the religion exists
+	-- (temples, wonders) used to hit a hard `created >= 0 -> return` bail --
+	-- the BELIEF end-turn blocker then deadlocked the game forever. Mirror of
+	-- ReligionScreen.lua:321-327's add-belief path.
+	if created ~= nil and created >= 0 then
+		local sent = 0;
+		for kBelief in GameInfo.Beliefs() do
+			if sent < earned and kBelief.BeliefClassType ~= "BELIEF_CLASS_PANTHEON" then
+				local okU, used = pcall(function()
+					return gameRel:IsInSomeReligion(kBelief.Index) or gameRel:IsInSomePantheon(kBelief.Index);
+				end);
+				local okM, tooMany = pcall(function()
+					return gameRel:IsTooManyForReligion(kBelief.Index, created);
+				end);
+				if okU and used ~= true and (not okM or tooMany ~= true) then
+					local tB = {};
+					tB[PlayerOperations.PARAM_BELIEF_TYPE] = kBelief.Hash;
+					tB[PlayerOperations.PARAM_INSERT_MODE] = PlayerOperations.VALUE_EXCLUSIVE;
+					UI.RequestPlayerOperation(Game.GetLocalPlayer(), PlayerOperations.ADD_BELIEF, tB);
+					Log("religion belief-fill -> %s (%s)", tostring(kBelief.BeliefType), tostring(kBelief.BeliefClassType));
+					sent = sent + 1;
+				end
+			end
+		end
+		if sent > 0 then g_religionDone = true; return true end
+		return false;
+	end
 
 	-- Any unfounded standard religion; skip custom-name ones (they need a text
 	-- param a rules engine has no business inventing).
@@ -2522,7 +2816,13 @@ local function CompositionWant(emp)
 		g_builderShortTurns = 0;
 		g_builderShortStampTurn = -1;
 	end
-	if emp.military < emp.cities * WANT_MILITARY_PER_CITY then return nil end  -- advisor picks WHICH soldier
+	-- Military shortage (audit #28: both branches of the old code returned nil,
+	-- making this guardrail a no-op since birth). Sentinel: the caller picks
+	-- WHICH soldier (strongest producible). Austerity-gated -- this path skips
+	-- CompositionVetoes, so the gpt guard must live here.
+	if emp.military < emp.cities * WANT_MILITARY_PER_CITY and (emp.gpt or 0) >= 0 then
+		return "ANY_MILITARY";
+	end
 	return nil;
 end
 
@@ -2654,8 +2954,12 @@ local function AutomateProduction(pPlayer, threats)
 			end
 			if dCity ~= nil and dCity <= 4 and nDefenders < 2 then
 				-- Sea threat -> build RANGED (only thing that can shoot boats
-				-- from land); land threat -> strongest as before.
-				local seaThreat = (NearestThreatDist(threats, pCity:GetX(), pCity:GetY(), true) == nil);
+				-- from land); land threat -> strongest as before. Scoped to
+				-- THIS city's trigger radius (audit #27): the old global scan
+				-- read "sea" as false whenever any land barb existed anywhere,
+				-- so besieged-by-galleys cities built melee.
+				local dLandHere = NearestThreatDist(threats, pCity:GetX(), pCity:GetY(), true);
+				local seaThreat = (dLandHere == nil or dLandHere > 4);
 				local best = nil;
 				for row in GameInfo.Units() do
 					if (row.Combat or 0) > 0 and row.Domain == "DOMAIN_LAND"
@@ -2692,7 +2996,11 @@ local function AutomateProduction(pPlayer, threats)
 					local okB, canBuy = pcall(function()
 						return CityManager.CanStartCommand(pCity, CityCommandTypes.PURCHASE, false, tBuy, false);
 					end);
-					if okB and canBuy == true then
+					if okB and canBuy == true and not g_cityBought[cityID] then
+						-- Once per city per turn (audit #12): PURCHASE is async
+						-- and CanStartCommand stays true until it lands, so a
+						-- re-pass double-fired = double gold spent.
+						g_cityBought[cityID] = true;
 						CityManager.RequestCommand(pCity, CityCommandTypes.PURCHASE, tBuy);
 						Log("defense [%s]: GOLD-BOUGHT %s (enemy %d out, %d defenders)",
 							tostring(pCity:GetName()),
@@ -2707,7 +3015,31 @@ local function AutomateProduction(pPlayer, threats)
 			-- balanced empire this is a no-op and the advisor runs as before.
 			if not g_cityOrdered[cityID] then
 				local want = CompositionWant(emp);
-				if want ~= nil then
+				if want == "ANY_MILITARY" then
+					-- Strongest producible land soldier, same doctrine as the
+					-- defense override (Anthony: later military units matter).
+					local bestU = nil;
+					for rowU in GameInfo.Units() do
+						if (rowU.Combat or 0) > 0 and rowU.Domain == "DOMAIN_LAND"
+						   and rowU.PromotionClass ~= "PROMOTION_CLASS_RECON"
+						   and CanCityProduce(rowU.Hash) then
+							if bestU == nil or (rowU.Combat or 0) > bestU.combat then
+								bestU = { hash = rowU.Hash, combat = rowU.Combat, utype = rowU.UnitType };
+							end
+						end
+					end
+					if bestU ~= nil then
+						local tParameters = {};
+						tParameters[CityOperationTypes.PARAM_UNIT_TYPE]   = bestU.hash;
+						tParameters[CityOperationTypes.PARAM_INSERT_MODE] = CityOperationTypes.VALUE_EXCLUSIVE;
+						CityManager.RequestOperation(pCity, CityOperationTypes.BUILD, tParameters);
+						g_cityOrdered[cityID] = true;
+						Log("composition [%s]: military short (%d < %d) -> %s",
+							tostring(pCity:GetName()), emp.military,
+							emp.cities * WANT_MILITARY_PER_CITY, tostring(bestU.utype));
+						emp.military = emp.military + 1;
+					end
+				elseif want ~= nil then
 					local row = GameInfo.Units[want];
 					if row ~= nil and CanCityProduce(row.Hash) then
 						local tParameters = {};
@@ -2802,7 +3134,9 @@ local function AutomateProduction(pPlayer, threats)
 							local okU, pUnits = pcall(function() return pPlayer:GetUnits(); end);
 							if okU and pUnits ~= nil then
 								for _, u in pUnits:Members() do
-									local info = GameInfo.Units[u:GetUnitType()];
+									-- Live units only (audit #13): corpses were
+									-- consuming the 2-per-type budget.
+									local info = (not u:IsDead()) and GameInfo.Units[u:GetUnitType()] or nil;
 									if info ~= nil then
 										tally[info.UnitType] = (tally[info.UnitType] or 0) + 1;
 									end
@@ -2832,10 +3166,11 @@ local function AutomateProduction(pPlayer, threats)
 							local militaryShort = (emp.military or 0) < (emp.cities or 0) * WANT_MILITARY_PER_CITY;
 
 							local pick = nil;   -- {hash, kind, rank, cost, combat}
+							local relax = false; -- pass 2 of the escalation ladder
 							local function consider(row, kind)
 								-- Same wonder exclusion as the advisor path.
 								if row.IsWonder == true or row.IsWonder == 1 then return end
-								if kind == "KIND_UNIT" then
+								if kind == "KIND_UNIT" and not relax then
 									if (tally[row.UnitType] or 0) >= 2 then return end
 									-- Composition vetoes apply HERE too (#28: the 11
 									-- scouts and 9 traders were all FALLBACK picks --
@@ -2876,6 +3211,21 @@ local function AutomateProduction(pPlayer, threats)
 							for row in GameInfo.Buildings() do consider(row, "KIND_BUILDING") end
 							if CityOperationTypes.PARAM_PROJECT_TYPE ~= nil then
 								for row in GameInfo.Projects() do consider(row, "KIND_PROJECT") end
+							end
+							-- ESCALATION (audit #13): if caps+vetoes filtered
+							-- EVERYTHING legal away, an idle city blocks the turn
+							-- forever. Anything producible beats that -- rerun
+							-- with the guardrails down.
+							if pick == nil then
+								relax = true;
+								for row in GameInfo.Units() do consider(row, "KIND_UNIT") end
+								for row in GameInfo.Buildings() do consider(row, "KIND_BUILDING") end
+								if CityOperationTypes.PARAM_PROJECT_TYPE ~= nil then
+									for row in GameInfo.Projects() do consider(row, "KIND_PROJECT") end
+								end
+								if pick ~= nil then
+									Log("produce [%s]: guardrails filtered everything -- relaxed pick", tostring(pCity:GetName()));
+								end
 							end
 							if pick ~= nil then
 								bestHash, bestKind = pick.hash, pick.kind;
@@ -3037,7 +3387,12 @@ local function RunAutomation()
 		local okDC, cities = pcall(function() return pPlayer:GetCities(); end);
 		if okDC and cities ~= nil then
 			for _, pCity in cities:Members() do
-				local d = NearestThreatDist(threats, pCity:GetX(), pCity:GetY());
+				-- LAND threats only (audit #11): a barb galley cruising the
+				-- coast flipped empire-wide defense mode that melee defenders
+				-- can never resolve -- converge/hold/settler-freeze forever.
+				-- The production override below keeps its own any-domain scan
+				-- (it can answer boats with ranged builds; soldiers cannot).
+				local d = NearestThreatDist(threats, pCity:GetX(), pCity:GetY(), true);
 				if d ~= nil and d <= CITY_DEFENSE_RADIUS
 				   and (g_defcity == nil or d < g_defcity.dist) then
 					g_defcity = { x = pCity:GetX(), y = pCity:GetY(),
@@ -3058,6 +3413,11 @@ local function RunAutomation()
 	-- judge cohesion against the same picture, or the first unit to move shifts
 	-- the rally point under the feet of the next one and they chase each other.
 	local army = BuildArmyCache(pPlayer);
+
+	-- Free damage first (#29): every city/encampment strike that CAN fire, fires.
+	if g_armies then
+		AutomateCityStrikes(pPlayer, eLocalPlayer, pDiplo, pVis);
+	end
 
 	if g_research then
 		AutomateResearch(pPlayer);
@@ -3084,6 +3444,9 @@ local function RunAutomation()
 		-- so gating this behind the idle test would miss precisely the units that
 		-- block the turn.
 		TryPromote(pUnit);
+		-- Upgrades ride the same pre-idle-gate slot (#30): a fortified warrior
+		-- eligible for swordsman never reads idle, exactly like promotions.
+		if g_armies and IsCombatUnit(pUnit) then TryUpgrade(pUnit, pPlayer) end
 
 		if not g_tasked[id] then
 			local why = IdleReason(pUnit);
@@ -3106,18 +3469,21 @@ local function RunAutomation()
 					if r == "build" or r == "repair" or r == "move" then nB = nB + 1 end
 					-- Unemployment signal for composition (issue #5): charges but
 					-- no work means stop hiring, not hire more.
-					if (r == nil or r == "idle") and pUnit:GetBuildCharges() > 0 then
+					if (r == nil or r == "idle" or r == "rest") and pUnit:GetBuildCharges() > 0 then
 						g_builderIdleThisTurn = true;
 					end
 				elseif IsTrader(pUnit) then
 					kind = "trader";
-					r = AutomateTrader(pUnit, pPlayer);
+					-- Decline gates (audit #17/#24): after two no-order passes
+					-- this turn the outcome is known -- catch-all only, same as
+					-- the builder/army branches. Kills the per-pass re-brain churn.
+					if (g_declines[id] or 0) < 2 then r = AutomateTrader(pUnit, pPlayer) end
 				elseif GetGP(pUnit) ~= nil then
 					kind = "greatperson";
-					r = AutomateGreatPerson(pUnit, pPlayer, GetGP(pUnit));
+					if (g_declines[id] or 0) < 2 then r = AutomateGreatPerson(pUnit, pPlayer, GetGP(pUnit)) end
 				elseif IsSettler(pUnit) then
 					kind = "settler";
-					r = AutomateSettler(pUnit, pPlayer, threats);
+					if (g_declines[id] or 0) < 2 then r = AutomateSettler(pUnit, pPlayer, threats) end
 				-- Recon before combat: scouts have a combat value, so without this
 				-- they fell into the armies branch and just fortified ("scouts
 				-- don't know what to do with themselves"). Wounded scouts retreat
@@ -3322,9 +3688,22 @@ local function EmitTelemetry(pPlayer)
 end
 
 local function OnLocalPlayerTurnBegin()
+	-- Last turn's suppressed-log summary BEFORE the reset (#33): hot blockers
+	-- stay visible to the outside monitor without the per-event flood.
+	for k, v in pairs(g_blkLogged) do
+		if v > 1 then Log("blocker %s fired x%d last turn (suppressed)", k, v) end
+	end
+	g_blkLogged      = {};
 	g_tasked         = {};
 	g_cityOrdered    = {};
+	g_cityBought     = {};
 	g_promoted       = {};
+	g_upgraded       = {};
+	g_upgradeCount   = 0;
+	g_struck         = {};
+	g_researchDone   = false;
+	g_civicDone      = false;
+	g_envoyLastTokens = -1;
 	g_retasks        = {};
 	g_districtNoPlot = {};
 	g_inflight       = {};
@@ -3375,7 +3754,10 @@ end
 local function OnEndTurnBlockingChanged(ePrev, eNew)
 	if eNew == nil or eNew == EndTurnBlockingTypes.NO_ENDTURN_BLOCKING then return end
 	local name = BlockerName(eNew);
-	Log("END-TURN BLOCKED by %s", name);
+	-- First fire per blocker type per turn logs; repeats are counted and
+	-- summarized at TurnBegin (#33: x145 UNITS lines in one session).
+	g_blkLogged[name] = (g_blkLogged[name] or 0) + 1;
+	if g_blkLogged[name] == 1 then Log("END-TURN BLOCKED by %s", name) end
 	if eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_UNITS
 	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_UNIT_NEEDS_ORDERS
 	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_STACKED_UNITS then
@@ -3394,6 +3776,10 @@ local function OnEndTurnBlockingChanged(ePrev, eNew)
 		g_religionDone = false;
 	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_CLAIM_GREAT_PERSON then
 		g_gpDone = false;
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_RESEARCH then
+		g_researchDone = false;   -- slot freed mid-turn; re-arm the async guard
+	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_CIVIC then
+		g_civicDone = false;
 	end
 	RequestPass();
 end
@@ -3415,6 +3801,16 @@ local MAX_RETASKS = 4;
 local function OnUnitOpResolved(player, unitID, hCommand, iData1)
 	if player ~= Game.GetLocalPlayer() then return end
 	g_inflight[unitID] = nil;   -- whatever was pending is pending no more
+
+	-- Death releases destination claims (audit #3): a dead unit's claim
+	-- otherwise blocks that tile for every other unit until turn end.
+	local pPD = Players[player];
+	local pUD = (pPD ~= nil) and pPD:GetUnits():FindID(unitID) or nil;
+	if pUD == nil or pUD:IsDead() then
+		for k, v in pairs(g_claims) do
+			if v == unitID then g_claims[k] = nil end
+		end
+	end
 
 	if g_tasked[unitID] then
 		-- Untask ONLY a unit that is genuinely ready for more. A resolved skip/
@@ -3657,6 +4053,12 @@ function Initialize()
 	-- again -- that was the frozen-builder bug in one line.
 	Events.UnitOperationsCleared.Add(       Safe("UnitOpsCleared",   OnUnitOpResolved));
 	Events.UnitOperationSegmentComplete.Add(Safe("UnitOpSegment",    OnUnitOpResolved));
+	-- COMMANDS resolve through their own event, NOT the operation queue (audit
+	-- #1/#4, live: "order-in-flight" x11): without this, every RequestCommand
+	-- (PROMOTE, ENTER/EXIT_FORMATION, ACTIVATE, UPGRADE) froze its unit for the
+	-- rest of the turn. Same handler signature (player, unitID, hCommand,
+	-- iData1) -- verified UnitPanel.lua:2452.
+	Events.UnitCommandStarted.Add(          Safe("UnitCmdStarted",   OnUnitOpResolved));
 	Events.UnitMoveComplete.Add(            Safe("UnitMoveComplete", OnUnitDone));
 	Events.EndTurnBlockingChanged.Add(      Safe("BlockingChanged",  OnEndTurnBlockingChanged));
 	Events.UnitAddedToMap.Add(              Safe("UnitAddedToMap",   OnUnitAddedToMap));

@@ -82,6 +82,11 @@ local g_defcity     = nil   -- {x,y,name,dist} set each pass: the own city with 
                             -- Read by the combat brain (defense mode) and by
                             -- CompositionVetoes (no settlers while under attack).
 local g_defLogName, g_defLogDist = nil, nil  -- last logged threat (log on change only)
+local g_declines    = {}    -- [unitID]=count of no-order outcomes this turn. The
+                            -- units-blocker clears g_tasked to force re-sweeps, so a
+                            -- unit the engine refuses everything for was re-brained
+                            -- and re-logged every pass all turn (524289/786438 live).
+                            -- Two strikes -> hand it straight to the catch-all.
 local g_rallyStuck  = {}    -- [unitID]={x,y,n,holdUntil}: rally attempts issued from
                             -- an unchanged position. 3 strikes -> the rally target is
                             -- unreachable from here (#24: warrior skipped 23 turns);
@@ -2254,7 +2259,7 @@ local SETTLER_CITY_CAP       = 6   -- stop expanding around here; deepen instead
 -- same turn and all four queue a builder. (Same failure mode as the
 -- g_cityOrdered debounce, one level up.)
 local function CountEmpire(pPlayer)
-	local c = { cities = 0, builders = 0, settlers = 0, military = 0, militaryAlive = 0 };
+	local c = { cities = 0, builders = 0, settlers = 0, military = 0, militaryAlive = 0, recon = 0 };
 
 	local okC, cities = pcall(function() return pPlayer:GetCities(); end);
 	if okC and cities ~= nil then
@@ -2283,7 +2288,8 @@ local function CountEmpire(pPlayer)
 			if not u:IsDead() then
 				if IsBuilder(u) then c.builders = c.builders + 1;
 				elseif IsSettler(u) then c.settlers = c.settlers + 1;
-				elseif IsCombatUnit(u) and not IsRecon(u) then
+				elseif IsRecon(u) then c.recon = c.recon + 1;
+				elseif IsCombatUnit(u) then
 					c.military = c.military + 1;
 					c.militaryAlive = c.militaryAlive + 1;
 				end
@@ -2323,6 +2329,11 @@ local function CompositionVetoes(h, emp)
 	if kType == nil or kType.Kind ~= "KIND_UNIT" then return false end
 	local row = GameInfo.Units[kType.Type];
 	if row == nil then return false end
+	-- Scouts are a luxury, not a priority (Anthony, 2026-07-17): one is plenty
+	-- for goody huts; every further recon pick is production the army needed.
+	if row.PromotionClass == "PROMOTION_CLASS_RECON" and emp.recon >= 1 then
+		return true, "recon cap";
+	end
 	if row.FoundCity == true or row.FoundCity == 1 then
 		-- Settler spam is the advisor's favourite failure. Two in flight is
 		-- plenty, and past the city cap we should be deepening, not sprawling.
@@ -2820,7 +2831,11 @@ local function RunAutomation()
 
 				if g_builders and isBuilder then
 					kind = "builder";
-					r = AutomateBuilder(pUnit, pPlayer, threats);
+					if (g_declines[id] or 0) >= 2 then
+						r = nil;   -- two no-order passes already; catch-all only
+					else
+						r = AutomateBuilder(pUnit, pPlayer, threats);
+					end
 					Log("builder %d -> %s", id, tostring(r));
 					if r == "build" or r == "repair" or r == "move" then nB = nB + 1 end
 					-- Unemployment signal for composition (issue #5): charges but
@@ -2852,7 +2867,21 @@ local function RunAutomation()
 					local dScout = NearestThreatDist(threats, pUnit:GetX(), pUnit:GetY());
 					local inContact = (dScout ~= nil and dScout <= 3);
 					if HPPercent(pUnit) < SCOUT_RETREAT_HP or inContact then
-						r = ScoutRetreat(pUnit, pPlayer, threats) and "retreat" or nil;
+						-- Hurt but DISENGAGED -> heal where we stand. Retreating
+						-- on every pass re-tasked hurt scouts to the cap turn
+						-- after turn (196608/393220 live) and they never healed.
+						if not inContact then
+							if CanStart(pUnit, UnitOperationTypes.HEAL) then
+								IssueOp(pUnit, UnitOperationTypes.HEAL);
+								r = "heal";
+							elseif CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+								IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+								r = "rest";
+							end
+						end
+						if r == nil then
+							r = ScoutRetreat(pUnit, pPlayer, threats) and "retreat" or nil;
+						end
 						if r == nil and inContact and g_armies then
 							r = AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, nil);
 						end
@@ -2882,7 +2911,7 @@ local function RunAutomation()
 					-- identical attempt was never going to work -- observed as
 					-- 4 warriors churning to the cap every turn. Rest instead;
 					-- fresh judgement next turn.
-					if (g_retasks[id] or 0) >= 2 then
+					if (g_retasks[id] or 0) >= 2 or (g_declines[id] or 0) >= 2 then
 						r = nil;
 					else
 						r = AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, army);
@@ -2900,7 +2929,11 @@ local function RunAutomation()
 				-- turn -- and either way the log names it, which is how we learn
 				-- what to automate next.
 				if r == nil or r == "idle" then
-					EnsureOrdered(pUnit, (kind or "?") .. ": no order issued", kind ~= "unclassified");
+					g_declines[id] = (g_declines[id] or 0) + 1;
+					-- Past the strike cap the outcome is known -- order the skip
+					-- without re-logging the same UNSTUCK line every re-sweep.
+					EnsureOrdered(pUnit, (kind or "?") .. ": no order issued",
+						kind ~= "unclassified");
 				end
 			elseif isBuilder then
 				-- The single most useful diagnostic: "my builder just sits there"
@@ -3025,6 +3058,7 @@ local function OnLocalPlayerTurnBegin()
 	g_pantheonDone   = false;
 	g_religionDone   = false;
 	g_gpDone         = false;
+	g_declines       = {};
 	g_builderIdleLastTurn = g_builderIdleThisTurn;
 	g_builderIdleThisTurn = false;
 	local e = Game.GetLocalPlayer();

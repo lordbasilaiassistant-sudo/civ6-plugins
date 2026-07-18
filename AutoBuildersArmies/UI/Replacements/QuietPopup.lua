@@ -1,0 +1,8 @@
+-- QuietPopup.lua -- AutoBuildersArmies issue #15 (auto-dismiss "continue" popups)
+--
+-- Intentionally empty. The base-game popup scripts subscribe themselves to the
+-- events that raise them (verified: every replaced context's XML root ships
+-- Hidden="1", e.g. BoostUnlockedPopup.xml:3, and only its Lua ever shows it).
+-- Replacing the script with this file means the context loads, stays hidden,
+-- and the era/boost/tech-quote/wonder/project interrupts simply never appear.
+-- To bring any popup back, delete its ReplaceUIScript entry from the .modinfo.

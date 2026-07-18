@@ -25,9 +25,53 @@ Everything runs on your turn only, is fully toggleable from an on-screen panel, 
       </Properties>
       <File>UI/AutoBuildersArmies.xml</File>
     </AddUserInterfaces>
+    <!-- Issue #15: kill the "continue"-click interrupts. Schema copied from the
+         engine's own GranColombia_Maya.modinfo:194-211 (ReplaceUIScript). Each
+         popup's XML root ships Hidden="1" and only its Lua ever shows it, so an
+         empty replacement script silences it cleanly. -->
+    <ReplaceUIScript id="ABA_Quiet_BoostUnlockedPopup">
+      <Properties>
+        <LuaContext>BoostUnlockedPopup</LuaContext>
+        <LuaReplace>UI/Replacements/QuietPopup.lua</LuaReplace>
+      </Properties>
+    </ReplaceUIScript>
+    <ReplaceUIScript id="ABA_Quiet_EraCompletePopup">
+      <Properties>
+        <LuaContext>EraCompletePopup</LuaContext>
+        <LuaReplace>UI/Replacements/QuietPopup.lua</LuaReplace>
+      </Properties>
+    </ReplaceUIScript>
+    <ReplaceUIScript id="ABA_Quiet_TechCivicCompletedPopup">
+      <Properties>
+        <LuaContext>TechCivicCompletedPopup</LuaContext>
+        <LuaReplace>UI/Replacements/QuietPopup.lua</LuaReplace>
+      </Properties>
+    </ReplaceUIScript>
+    <ReplaceUIScript id="ABA_Quiet_WonderBuiltPopup">
+      <Properties>
+        <LuaContext>WonderBuiltPopup</LuaContext>
+        <LuaReplace>UI/Replacements/QuietPopup.lua</LuaReplace>
+      </Properties>
+    </ReplaceUIScript>
+    <ReplaceUIScript id="ABA_Quiet_NaturalWonderPopup">
+      <Properties>
+        <LuaContext>NaturalWonderPopup</LuaContext>
+        <LuaReplace>UI/Replacements/QuietPopup.lua</LuaReplace>
+      </Properties>
+    </ReplaceUIScript>
+    <ReplaceUIScript id="ABA_Quiet_ProjectBuiltPopup">
+      <Properties>
+        <LuaContext>ProjectBuiltPopup</LuaContext>
+        <LuaReplace>UI/Replacements/QuietPopup.lua</LuaReplace>
+      </Properties>
+    </ReplaceUIScript>
+    <ImportFiles id="ABA_QuietPopupFiles">
+      <File>UI/Replacements/QuietPopup.lua</File>
+    </ImportFiles>
   </InGameActions>
   <Files>
     <File>UI/AutoBuildersArmies.xml</File>
     <File>UI/AutoBuildersArmies.lua</File>
+    <File>UI/Replacements/QuietPopup.lua</File>
   </Files>
 </Mod>

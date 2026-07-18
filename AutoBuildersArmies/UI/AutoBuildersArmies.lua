@@ -50,10 +50,6 @@ local g_retasks     = {}    -- [unitID]=count of re-tasks this turn. A unit whos
                             -- re-issue forever within one turn.
 local g_pantheonDone  = false -- pantheon requested this turn (async; see g_envoyDone)
 local g_religionDone  = false -- religion founding requested this turn (async)
-local g_govDone       = false -- government change requested this turn (async)
-local g_govBlocked    = false -- CONSIDER_GOVERNMENT_CHANGE blocker active: the
-                              -- game itself says pick a government NOW (free
-                              -- window) -- the only time we auto-switch.
 local g_gpDone        = false -- great-person recruit requested this turn (async)
 local g_inflight    = {}    -- [unitID]=true, an order is ISSUED but not yet resolved.
                             -- The keystone debounce (issue #3): every Request* is
@@ -1923,42 +1919,6 @@ local function AutomateReligion(pPlayer)
 	return true;
 end
 
--- ---------------------------------------------------------- government ------
---
--- Fires ONLY while the game's own CONSIDER_GOVERNMENT_CHANGE blocker is up --
--- that is the free-change window, so no anarchy risk. All verified in
--- UI/Screens/GovernmentScreen.lua: gate :859-873 (CanChangeGovernmentAtAll +
--- not GovernmentChangeMade + IsAllowStrategicCommands), unlock :2334
--- (IsGovernmentUnlocked(hash)), slots via GameInfo.Government_SlotCounts
--- :2427-2434, commit :912 pCulture:RequestChangeGovernment(hash).
-local function AutomateGovernment(pPlayer)
-	if g_govDone or not g_govBlocked then return false end
-	local okC, pCulture = pcall(function() return pPlayer:GetCulture(); end);
-	if not okC or pCulture == nil then return false end
-	local okG, canAll = pcall(function() return pCulture:CanChangeGovernmentAtAll(); end);
-	local okM, made   = pcall(function() return pCulture:GovernmentChangeMade(); end);
-	if not okG or canAll ~= true or not okM or made == true then return false end
-
-	local slotTotals = {};
-	for entry in GameInfo.Government_SlotCounts() do
-		slotTotals[entry.GovernmentType] = (slotTotals[entry.GovernmentType] or 0) + (entry.NumSlots or 0);
-	end
-	local best, bestSlots = nil, -1;
-	for row in GameInfo.Governments() do
-		local t = GameInfo.Types[row.GovernmentType];
-		local okU, unlocked = pcall(function() return pCulture:IsGovernmentUnlocked(t.Hash); end);
-		if okU and unlocked == true then
-			local n = slotTotals[row.GovernmentType] or 0;
-			if n > bestSlots then bestSlots, best = n, t end
-		end
-	end
-	if best == nil then return false end
-	local okR, done = pcall(function() return pCulture:RequestChangeGovernment(best.Hash); end);
-	g_govDone = true;
-	Log("government -> %s (%d slots) accepted=%s", tostring(best.Type), bestSlots, tostring(okR and done));
-	return true;
-end
-
 -- --------------------------------------------------------- great people -----
 --
 -- Claims earned great people (ENDTURN_BLOCKING_CLAIM_GREAT_PERSON). Verified
@@ -2513,7 +2473,6 @@ local function RunAutomation()
 		AutomateEnvoys(pPlayer);
 		AutomatePantheon(pPlayer);
 		AutomateReligion(pPlayer);
-		AutomateGovernment(pPlayer);
 		AutomateGreatPeopleClaim(pPlayer);
 	end
 	if g_produce then
@@ -2750,7 +2709,6 @@ local function OnLocalPlayerTurnBegin()
 	g_envoyDone      = false;
 	g_pantheonDone   = false;
 	g_religionDone   = false;
-	g_govDone        = false;
 	g_gpDone         = false;
 	g_builderIdleLastTurn = g_builderIdleThisTurn;
 	g_builderIdleThisTurn = false;
@@ -2807,8 +2765,6 @@ local function OnEndTurnBlockingChanged(ePrev, eNew)
 	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_RELIGION
 	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_BELIEF then
 		g_religionDone = false;
-	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_CONSIDER_GOVERNMENT_CHANGE then
-		g_govBlocked = true; g_govDone = false;
 	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_CLAIM_GREAT_PERSON then
 		g_gpDone = false;
 	end

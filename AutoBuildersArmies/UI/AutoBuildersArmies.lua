@@ -50,7 +50,6 @@ local g_retasks     = {}    -- [unitID]=count of re-tasks this turn. A unit whos
                             -- re-issue forever within one turn.
 local g_pantheonDone  = false -- pantheon requested this turn (async; see g_envoyDone)
 local g_religionDone  = false -- religion founding requested this turn (async)
-local g_policyDone    = false -- policy slotting requested this turn (async)
 local g_govDone       = false -- government change requested this turn (async)
 local g_govBlocked    = false -- CONSIDER_GOVERNMENT_CHANGE blocker active: the
                               -- game itself says pick a government NOW (free
@@ -1924,104 +1923,6 @@ local function AutomateReligion(pPlayer)
 	return true;
 end
 
--- ---------------------------------------------------------------- policies ---
---
--- ENDTURN_BLOCKING_FILL_CIVIC_SLOT caught live by the watchdog (issue #12):
--- empty policy slots block the turn and nothing filled them. Fill EMPTY slots
--- only -- a policy Anthony slotted himself is never churned. All verified in
--- UI/Screens/GovernmentScreen.lua: slots :2284-2287, legality :2225-2226 and
--- the :24 comment (engine checks !IsPolicyActive), commit :1570
--- pCulture:RequestPolicyChanges(clearList, addList) -- clearList = slot
--- indices (0-based), addList = [slotIndex] = PolicyHash. Slot compatibility
--- via Policies.GovernmentSlotType (schema:387); wildcard slots accept any.
-local function AutomatePolicies(pPlayer)
-	if g_policyDone then return false end
-	local okC, pCulture = pcall(function() return pPlayer:GetCulture(); end);
-	if not okC or pCulture == nil then return false end
-
-	local okN, nSlots = pcall(function() return pCulture:GetNumPolicySlots(); end);
-	if not okN or nSlots == nil or nSlots <= 0 then return false end
-
-	-- Diagnostics for the not-landing request (issue #12, Germany live): the
-	-- gate the game's own screen checks before allowing changes
-	-- (GovernmentScreen.lua:848), plus the raw slot map. If the request drops
-	-- again, THIS line says why instead of leaving us guessing.
-	local function B(f) local ok, v = pcall(f); return ok and tostring(v) or "ERR" end
-	Log("policy gate: slots=%d open=%s civicDone=%s changeMade=%s allowCmds=%s",
-		nSlots,
-		B(function() return pCulture:GetNumPolicySlotsOpen() end),
-		B(function() return pCulture:CivicCompletedThisTurn() end),
-		B(function() return pCulture:PolicyChangeMade() end),
-		B(function() return Game.IsAllowStrategicCommands(pPlayer:GetID()) end));
-	for i = 0, nSlots - 1 do
-		Log("policy slot %d: type=%s current=%s", i,
-			B(function() return GameInfo.GovernmentSlots[pCulture:GetSlotType(i)].GovernmentSlotType end),
-			B(function() return pCulture:GetSlotPolicy(i) end));
-	end
-
-	local addList, clearList, nAdd = {}, {}, 0;
-	local usedHash = {};   -- one policy can fill only one slot per request
-	for i = 0, nSlots - 1 do
-		local okS, slotPolicy = pcall(function() return pCulture:GetSlotPolicy(i); end);
-		if okS and (slotPolicy == nil or slotPolicy == -1) then
-			local okT, slotType = pcall(function() return pCulture:GetSlotType(i); end);
-			local slotRow  = okT and GameInfo.GovernmentSlots[slotType] or nil;
-			local slotName = (slotRow ~= nil) and slotRow.GovernmentSlotType or nil;
-			if slotName ~= nil then
-				for row in GameInfo.Policies() do
-					if not usedHash[row.PolicyHash or row.Hash] then
-						local h = row.PolicyHash or row.Hash;
-						-- EXACT fit only. Wildcard slots are excluded: the engine
-						-- rejects normal policies there via this path
-						-- (GovernmentScreen.lua:24 comment), and one rejected
-						-- entry dropped the ENTIRE batch -- Greece's wildcard
-						-- game never filled while wildcard-less games did.
-						local fits = (row.GovernmentSlotType == slotName);
-						if fits then
-							local okU, unlocked = pcall(function() return pCulture:IsPolicyUnlocked(h); end);
-							local okO, obsolete = pcall(function() return pCulture:IsPolicyObsolete(h); end);
-							-- IsPolicyActive dropped from the filter: its arg type
-							-- (index vs hash) is unverified and a wrong type could
-							-- read everything as active -> nAdd=0 (Anthony's empty-
-							-- slot report). usedHash dedupes within the request;
-							-- true duplicates get engine-rejected harmlessly.
-							if okU and unlocked == true and okO and obsolete ~= true then
-								addList[i] = h;
-								usedHash[h] = true;
-								nAdd = nAdd + 1;
-								Log("policy slot %d (%s) -> %s", i, slotName, tostring(row.PolicyType));
-								break;
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-
-	if nAdd == 0 then
-		-- Anthony's report: empty slots left unfilled with no explanation.
-		-- Distinguish "nothing unlocked yet" from a real eligibility bug.
-		local hadEmpty = false;
-		for i = 0, nSlots - 1 do
-			local okS, sp = pcall(function() return pCulture:GetSlotPolicy(i); end);
-			if okS and (sp == nil or sp == -1) then hadEmpty = true; break end
-		end
-		if hadEmpty then
-			Log("policy fill: empty slot(s) but ZERO eligible policies (unlocked/not-obsolete/not-active/slot-fit all failed) -- investigate");
-		end
-		return false;
-	end
-	-- One request PER SLOT: a single engine-rejected entry silently killed the
-	-- whole batched request (Greece live evidence -- picks logged, nothing
-	-- landed, every turn). Independent requests let valid slots land.
-	for slotIdx, hash in pairs(addList) do
-		pCulture:RequestPolicyChanges({}, { [slotIdx] = hash });
-	end
-	g_policyDone = true;
-	return true;
-end
-
 -- ---------------------------------------------------------- government ------
 --
 -- Fires ONLY while the game's own CONSIDER_GOVERNMENT_CHANGE blocker is up --
@@ -2612,7 +2513,6 @@ local function RunAutomation()
 		AutomateEnvoys(pPlayer);
 		AutomatePantheon(pPlayer);
 		AutomateReligion(pPlayer);
-		AutomatePolicies(pPlayer);
 		AutomateGovernment(pPlayer);
 		AutomateGreatPeopleClaim(pPlayer);
 	end
@@ -2850,7 +2750,6 @@ local function OnLocalPlayerTurnBegin()
 	g_envoyDone      = false;
 	g_pantheonDone   = false;
 	g_religionDone   = false;
-	g_policyDone     = false;
 	g_govDone        = false;
 	g_gpDone         = false;
 	g_builderIdleLastTurn = g_builderIdleThisTurn;
@@ -2908,8 +2807,6 @@ local function OnEndTurnBlockingChanged(ePrev, eNew)
 	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_RELIGION
 	   or eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_BELIEF then
 		g_religionDone = false;
-	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_FILL_CIVIC_SLOT then
-		g_policyDone = false;
 	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_CONSIDER_GOVERNMENT_CHANGE then
 		g_govBlocked = true; g_govDone = false;
 	elseif eNew == EndTurnBlockingTypes.ENDTURN_BLOCKING_CLAIM_GREAT_PERSON then

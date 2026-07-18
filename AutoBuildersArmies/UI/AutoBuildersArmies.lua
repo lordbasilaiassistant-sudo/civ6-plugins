@@ -146,6 +146,18 @@ local g_collapsed = false
 local g_candidate = nil    -- {x,y,name,owner}
 local g_target    = nil    -- {x,y,name,owner}
 
+-- War brain state (Anthony live 2026-07-18: empire mostly conquered while the mod
+-- only ever DEFENDED). g_posture is recomputed EVERY pass by EvaluateWarPosture,
+-- so -- like g_defcity -- none of these need a TurnBegin reset; a stale value can
+-- never strand a unit. g_targetAuto follows g_target's lifecycle, g_milHistory IS
+-- the trend: both ride the hotload cache (OnShutdown/OnGameDebugReturn).
+local g_posture        = "PEACE" -- PEACE | DEFENSE | COUNTERATTACK | TURTLE (recomputed each pass)
+local g_targetAuto     = false   -- true iff g_target was auto-picked (never for a manual ATTACK)
+local g_lostCity       = false   -- an own-original city is currently enemy-held (recomputed each pass)
+local g_postureLogName = nil     -- last-logged posture, for log-on-change (mirrors g_defLogName)
+local g_milHistory     = {}      -- ring buffer of own alive-combat-unit counts, last WAR_MIL_WINDOW turns.
+                                 -- PERSISTENT: appended once/turn in EmitTelemetry, NOT reset at TurnBegin.
+
 -- Committed settling site per settler ([unitID] = {x,y}). Persists across turns
 -- on purpose: site recommendations shift every turn as scouts reveal the map,
 -- and re-choosing each turn made settlers chase moving targets instead of
@@ -255,6 +267,16 @@ local CITY_DEFENDER_PULL  = 8  -- soldiers this close to the threatened city def
 local DEFENSE_STR_MARGIN  = 10 -- extra melee margin while defending (accept near-even)
 local BUILDER_FLEE_DIST   = 2  -- builders run home at this threat range (they die in place otherwise)
 local MELEE_WOUNDED_HP  = 40   -- ...or if the enemy is at/below this HP%
+
+-- War brain (Anthony live 2026-07-18: his empire got mostly conquered while the
+-- mod only ever DEFENDED -- no counter-attack, no retake drive, no losing-war
+-- turtle). These tune the four-state posture machine in EvaluateWarPosture.
+local WAR_TURTLE_DEFENSE_RADIUS = 5    -- while losing, widen the city-defense scan (vs CITY_DEFENSE_RADIUS)
+local WAR_STRIKE_RANGE          = 10   -- an enemy city farther than this from our nearest city is out of counter-attack range
+local WAR_MIL_WINDOW            = 6    -- turns of own-army-size history kept (the trend)
+local WAR_MIL_COLLAPSE          = 0.6  -- army <= this fraction of its recent peak = military collapse
+local WAR_MIL_MIN_PEAK          = 4    -- ...but only once the peak was at least this big (ignore early-game noise)
+local RETAKE_BONUS             = 1000  -- reclaiming an own captured city dominates every other target score
 
 -- ---------------------------------------------------------------- helpers ---
 
@@ -1877,6 +1899,7 @@ end
 --     to the rally point and wait for the others instead of feeding yourself in.
 local ARMY_RADIUS    = 3   -- within this of the group's centre counts as "together"
 local ARMY_MIN_GROUP = 3   -- fewer than this together -> muster, do not advance
+local SIEGE_MIN_MASS = 3   -- minimum units massed near the forward staging unit before we press an assault
 
 -- Our land combat units (scouts excluded -- they explore, they are not the army).
 local function BuildArmyCache(pPlayer)
@@ -1887,7 +1910,7 @@ local function BuildArmyCache(pPlayer)
 		if not u:IsDead() and IsCombatUnit(u) and not IsRecon(u) then
 			local info = GameInfo.Units[u:GetUnitType()];
 			if info ~= nil and info.Domain == "DOMAIN_LAND" then
-				t[#t + 1] = { id = u:GetID(), x = u:GetX(), y = u:GetY() };
+				t[#t + 1] = { id = u:GetID(), x = u:GetX(), y = u:GetY(), ranged = IsRanged(u) };
 			end
 		end
 	end
@@ -1928,6 +1951,38 @@ local function IsCohesive(army, x, y)
 	local need = math.min(ARMY_MIN_GROUP, #army);
 	if need <= 1 then return true end
 	return GroupSizeNear(army, x, y) >= need;
+end
+
+-- SIEGE MASS DISCIPLINE (Anthony live 2026-07-18: units trickled into a defended
+-- city one at a time and died one at a time -- his whole empire fell that way).
+-- Given the target, find the forward staging unit (ours nearest the target) and
+-- ask whether enough of the army has massed around it, with ranged support if the
+-- army has any. Returns ready, musterX, musterY. A nil/empty army (sea units, no
+-- army data) NEVER blocks -- returns true so those press on unchanged.
+local function SiegeReady(army, tx, ty)
+	if army == nil or #army == 0 then return true, nil, nil end
+	local fwd, fwdD = nil, 9999;
+	for _, a in ipairs(army) do
+		local d = Map.GetPlotDistance(a.x, a.y, tx, ty);
+		if d < fwdD then fwdD = d; fwd = a end
+	end
+	if fwd == nil then return true, nil, nil end
+	local massN, massRanged, anyRanged = 0, false, false;
+	for _, a in ipairs(army) do
+		if a.ranged then anyRanged = true end
+		if Map.GetPlotDistance(a.x, a.y, fwd.x, fwd.y) <= ARMY_RADIUS then
+			massN = massN + 1;
+			if a.ranged then massRanged = true end
+		end
+	end
+	-- Need at least SIEGE_MIN_MASS, and at least half the army -- but NEVER more
+	-- than the army actually HAS (the IsCohesive min() lesson: demanding 3 from a
+	-- 2-unit army made `ready` permanently false and branch D never assaulted).
+	-- Ranged required in the mass ONLY if the army owns any (a pure-melee force is
+	-- never blocked on siege for lacking artillery it does not have).
+	local need  = math.min(math.max(SIEGE_MIN_MASS, math.ceil(#army / 2)), #army);
+	local ready = (massN >= need) and (massRanged or not anyRanged);
+	return ready, fwd.x, fwd.y;
 end
 
 -- Support units walk to the army and stay with it; with no army they garrison
@@ -2410,13 +2465,43 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	--     Still respects healing above, so a broken unit pulls back rather than
 	--     feeding itself to the walls one at a time.
 	if g_target ~= nil and hp >= HEAL_HP_THRESHOLD then
-		if AdvanceToward(pUnit, eLocalPlayer, pDiplo, pVis, myStr, g_target, threats) then
-			return "assault";
+		local dTgt = Map.GetPlotDistance(x, y, g_target.x, g_target.y);
+		local ready, mx, my = SiegeReady(army, g_target.x, g_target.y);
+		if ready or dTgt <= 2 then
+			-- Massed, OR already at the walls: press the assault (unchanged
+			-- AdvanceToward, isAssault contact acceptance still applies).
+			if AdvanceToward(pUnit, eLocalPlayer, pDiplo, pVis, myStr, g_target, threats) then
+				return "assault";
+			end
+		else
+			-- Short of siege mass: gather at the forward muster, then hold. Two-stage
+			-- with the cohesion gate C above -- a scattered army first coalesces via
+			-- centre-of-mass, THEN this target-forward mass+ranged gate keeps units
+			-- from feeding themselves at the walls one at a time.
+			if mx ~= nil and not (mx == x and my == y) and MoveTo(pUnit, mx, my) then
+				LogOnce("siege:" .. pUnit:GetID(), "unit %d: siege-mustering toward %d,%d", pUnit:GetID(), mx, my);
+				return "siege-muster";
+			end
+			-- SKIP not FORTIFY next to an enemy (the cohesion-gate revolving-door
+			-- lesson): a fortified unit in contact is re-woken and re-dropped instantly.
+			local dHere = NearestThreatDist(threats, x, y);
+			if dHere ~= nil and dHere <= 1 and CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+				IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+				return "siege-wait";
+			end
+			if CanStart(pUnit, UnitOperationTypes.FORTIFY) then
+				IssueOp(pUnit, UnitOperationTypes.FORTIFY);
+				return "siege-wait";
+			end
+			if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+				IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+				return "siege-wait";
+			end
 		end
 	end
 
 	-- E) Optional: march on the nearest enemy along safe tiles (higher risk).
-	if g_advance and hp >= HEAL_HP_THRESHOLD then
+	if g_advance and g_posture ~= "TURTLE" and hp >= HEAL_HP_THRESHOLD then
 		if AdvanceToward(pUnit, eLocalPlayer, pDiplo, pVis, myStr, nil, threats) then
 			return "advance";
 		end
@@ -3642,6 +3727,15 @@ function RefreshUI()
 	end
 	if Controls.ABA_ClearBtn ~= nil then Controls.ABA_ClearBtn:SetHide(g_target == nil) end
 
+	-- War posture line (Anthony must SEE what the brain decided). Red for TURTLE.
+	if Controls.ABA_PostureLbl ~= nil then
+		local TXT = { PEACE = "War: PEACE", DEFENSE = "War: DEFENDING",
+		              COUNTERATTACK = "War: COUNTER-ATTACK", TURTLE = "War: TURTLE (losing)" };
+		local COL = { PEACE = COL_OFF, DEFENSE = COL_WARN, COUNTERATTACK = COL_ON, TURTLE = 0xFF3B3BFF };
+		Controls.ABA_PostureLbl:SetText(TXT[g_posture] or ("War: " .. tostring(g_posture)));
+		Controls.ABA_PostureLbl:SetColor(COL[g_posture] or COL_OFF);
+	end
+
 	if Controls.ABA_Body   ~= nil then Controls.ABA_Body:CalculateSize() end
 	if Controls.ABA_Stack  ~= nil then Controls.ABA_Stack:CalculateSize() end
 end
@@ -3655,6 +3749,228 @@ local function UpdateStatus(nB, nA)
 		Controls.ABA_Status:SetText("Turn " .. t .. ": " .. nB .. " builder(s), " .. nA .. " unit(s) acted.");
 	end
 	if Controls.ABA_Stack ~= nil then Controls.ABA_Stack:CalculateSize() end
+end
+
+-- ------------------------------------------------------------- war brain ----
+--
+-- THE GAP (Anthony, live 2026-07-18): his empire got mostly conquered by an AI
+-- while the mod ONLY defended. g_target was only ever set by the manual ATTACK
+-- button. This adds the missing offensive/turtle brain: a four-state posture
+-- machine, an auto counter-attack/retake target picker, and (paired with
+-- SiegeReady) siege mass discipline.
+
+-- Enemy city's current defense strength (the garrison combat value shown in combat
+-- previews). Read off the city-center DISTRICT, not the city -- CitySupport.lua
+-- :361,373 and ProductionPanel.lua:1879
+-- (Players[owner]:GetDistricts():FindID(city:GetDistrictID()):GetDefenseStrength()).
+-- Returns 0 on any failure so an unreadable city never blocks target selection
+-- (0 = maximum "soft target" bonus, which is fine -- worst case we prefer it).
+local function EnemyCityDefense(pCity, ownerID)
+	local ok, str = pcall(function()
+		local pOwner = Players[ownerID];
+		if pOwner == nil then return 0 end
+		local dists = pOwner:GetDistricts();
+		if dists == nil then return 0 end
+		local pDist = dists:FindID(pCity:GetDistrictID());
+		if pDist == nil then return 0 end
+		return pDist:GetDefenseStrength();
+	end);
+	return (ok and str ~= nil) and str or 0;
+end
+
+-- PATHABILITY GATE (verifier fix 2026-07-18): hex range is NOT path range. An
+-- island / across-water enemy city 10 hexes away -- especially a RETAKE_BONUS'd
+-- one -- would be auto-picked and then LOCK g_target forever while land units
+-- milled at the shore. Require a real land path from our forward unit to a plot
+-- ADJACENT to the city (you cannot path onto the occupied centre). Fails SAFE:
+-- if it cannot confirm reachability the city is skipped and COUNTERATTACK falls
+-- through to branch E, which advances per-unit on whatever it can actually reach.
+local function CityReachable(pPlayer, army, cx, cy)
+	if army == nil or #army == 0 then return false end
+	local fwd, fwdD = nil, 9999;
+	for _, a in ipairs(army) do
+		local d = Map.GetPlotDistance(a.x, a.y, cx, cy);
+		if d < fwdD then fwdD = d; fwd = a end
+	end
+	if fwd == nil then return false end
+	if fwdD <= 1 then return true end   -- already at the walls: unambiguously reachable
+	local okU, pUnit = pcall(function() return pPlayer:GetUnits():FindID(fwd.id); end);
+	if not okU or pUnit == nil then return false end
+	for dir = 0, 5 do
+		local adj = Map.GetAdjacentPlot(cx, cy, dir);
+		if adj ~= nil and not adj:IsWater() and not adj:IsImpassable() and not adj:IsCity() then
+			local okP, pathInfo = pcall(function()
+				return UnitManager.GetMoveToPathEx(pUnit, adj:GetIndex());
+			end);
+			if okP and pathInfo ~= nil and pathInfo.plots ~= nil and table.count(pathInfo.plots) > 1 then
+				return true;
+			end
+		end
+	end
+	return false;
+end
+
+-- Pick the enemy city worth attacking -- called ONLY in posture COUNTERATTACK with
+-- no manual target. Retaking our own captured cities dominates: a city whose
+-- GetOriginalOwner==us but GetOwner~=us is one the enemy took (CityBannerManager
+-- .lua:1807, the exact "held by someone other than its founder" test). Range-gated
+-- by WAR_STRIKE_RANGE (the task's "within striking range" requirement) AND
+-- pathability-gated (CityReachable); returns nil if nothing qualifies, so
+-- COUNTERATTACK then falls through to branch E to go find them. Same pid 0..62
+-- at-war city shape as NearestEnemyObjective(:2043).
+local function PickCounterattackTarget(pPlayer, eLocalPlayer, pDiplo, pVis, threats, army)
+	local best, bestScore = nil, -1;
+	for pid = 0, 62 do
+		local p = Players[pid];
+		if p ~= nil and pid ~= eLocalPlayer and p:IsAlive() and pDiplo:IsAtWarWith(pid) then
+			local ok, cities = pcall(function() return p:GetCities(); end);
+			if ok and cities ~= nil then
+				for _, pCity in cities:Members() do
+					local cx, cy = pCity:GetX(), pCity:GetY();
+					if pVis ~= nil and pVis:IsRevealed(cx, cy) then
+						local home = NearestOwnCityPlot(pPlayer, cx, cy);
+						local dOwn = (home ~= nil)
+							and Map.GetPlotDistance(cx, cy, home:GetX(), home:GetY()) or 9999;
+						if dOwn <= WAR_STRIKE_RANGE and CityReachable(pPlayer, army, cx, cy) then
+							local score = 0;
+							-- Retake our own lost cities first (ownership, fog-independent).
+							local okO, orig = pcall(function() return pCity:GetOriginalOwner(); end);
+							if okO and orig == eLocalPlayer then score = score + RETAKE_BONUS end
+							score = score + (WAR_STRIKE_RANGE - dOwn) * 10;              -- closer to our front
+							score = score + math.max(0, 200 - EnemyCityDefense(pCity, pid)); -- softer target first
+							local dThreat = NearestThreatDist(threats, cx, cy);          -- the city the war stages from
+							if dThreat ~= nil then score = score + math.max(0, 40 - dThreat) end
+							if score > bestScore then
+								bestScore = score;
+								local nm = "enemy city";
+								local okN, n = pcall(function() return Locale.Lookup(pCity:GetName()); end);
+								if okN and n ~= nil then nm = n end
+								best = { x = cx, y = cy, name = nm, owner = pid };  -- same shape OnAttack builds
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return best;
+end
+
+-- The posture state machine (four states, deliberately -- matching the codebase's
+-- conservatism): PEACE | DEFENSE | COUNTERATTACK | TURTLE. Computed ONCE per pass,
+-- and it ABSORBS the g_defcity threatened-city scan (moved out of RunAutomation)
+-- because the turtle-widened defense radius must be known before that scan runs.
+-- Sets g_posture, g_defcity, g_lostCity, and (in COUNTERATTACK) an auto g_target.
+local function EvaluateWarPosture(pPlayer, eLocalPlayer, pDiplo, pVis, threats, army)
+	-- 1) At war with any living MAJOR? (Minors/barbarians = DEFENSE only, never a
+	--    counter-attack war.) PlayerManager.GetAliveMajors -- DiplomacyActionView.lua:1535.
+	local atWarMajor = false;
+	local okM, majors = pcall(function() return PlayerManager.GetAliveMajors(); end);
+	if okM and majors ~= nil then
+		for _, m in ipairs(majors) do
+			local mid = m:GetID();
+			if mid ~= eLocalPlayer and pDiplo:IsAtWarWith(mid) then atWarMajor = true; break end
+		end
+	end
+
+	-- 2) Lost an own-original city? Ownership-based, fog-independent: a city whose
+	--    GetOriginalOwner==us but GetOwner~=us is one the enemy took
+	--    (CityBannerManager.lua:1807). Scan every at-war player's cities.
+	local lostCity = false;
+	for pid = 0, 62 do
+		local p = Players[pid];
+		if p ~= nil and pid ~= eLocalPlayer and p:IsAlive() and pDiplo:IsAtWarWith(pid) then
+			local okC, cities = pcall(function() return p:GetCities(); end);
+			if okC and cities ~= nil then
+				for _, pCity in cities:Members() do
+					local okO, orig = pcall(function() return pCity:GetOriginalOwner(); end);
+					if okO and orig == eLocalPlayer then lostCity = true; break end
+				end
+			end
+		end
+		if lostCity then break end
+	end
+	g_lostCity = lostCity;
+
+	-- 3) Military collapse: our alive-combat count dropped >40% off its recent peak
+	--    (g_milHistory, appended once/turn in EmitTelemetry). Needs a real peak
+	--    first so early-game growth noise never reads as collapse.
+	local militaryCollapsed = false;
+	if #g_milHistory >= 2 then
+		local cur, peak = g_milHistory[#g_milHistory], 0;
+		for _, v in ipairs(g_milHistory) do if v > peak then peak = v end end
+		if peak >= WAR_MIL_MIN_PEAK and cur <= peak * WAR_MIL_COLLAPSE then militaryCollapsed = true end
+	end
+
+	-- TURTLE triggers on military COLLAPSE only, NOT on a lost city (verifier fix:
+	-- the old `losing = lostCity or collapsed` forced TURTLE the instant a city was
+	-- taken, and TURTLE blocks COUNTERATTACK -- so the retake drive was DEAD CODE,
+	-- unreachable exactly when it was needed). Losing a city with an intact army is
+	-- the trigger to COUNTER-ATTACK and take it back. A lost city still WIDENS the
+	-- defense radius (more cities flip to defense while the front is hot).
+	local losing    = militaryCollapsed;
+	local defRadius = (militaryCollapsed or lostCity) and WAR_TURTLE_DEFENSE_RADIUS or CITY_DEFENSE_RADIUS;
+
+	-- 4) Threatened-city scan (moved here from RunAutomation, #25). LAND threats
+	--    only, log-on-change -- identical to before but with defRadius (wider while
+	--    losing, so more cities flip to defense and more soldiers converge).
+	g_defcity = nil;
+	if threats ~= nil and #threats > 0 then
+		local okDC, cities = pcall(function() return pPlayer:GetCities(); end);
+		if okDC and cities ~= nil then
+			for _, pCity in cities:Members() do
+				local d = NearestThreatDist(threats, pCity:GetX(), pCity:GetY(), true);
+				if d ~= nil and d <= defRadius
+				   and (g_defcity == nil or d < g_defcity.dist) then
+					g_defcity = { x = pCity:GetX(), y = pCity:GetY(),
+					              name = pCity:GetName(), dist = d };
+				end
+			end
+		end
+		if g_defcity ~= nil
+		   and (g_defLogName ~= g_defcity.name or g_defLogDist ~= g_defcity.dist) then
+			Log("CITY UNDER THREAT: %s (enemy %d out) -- defense mode on",
+				tostring(g_defcity.name), g_defcity.dist);
+			g_defLogName, g_defLogDist = g_defcity.name, g_defcity.dist;
+		end
+	end
+
+	-- 5) Decide posture. Cities first and foremost (#25): a threatened city is
+	--    DEFENSE even at war with a major, UNLESS the army has collapsed (TURTLE:
+	--    pull everyone home, no wandering offense). A barbarian at a city is still
+	--    DEFENSE, exactly as today.
+	if not atWarMajor then
+		g_posture = (g_defcity ~= nil) and "DEFENSE" or "PEACE";
+	elseif losing then
+		g_posture = "TURTLE";
+	elseif g_defcity ~= nil then
+		g_posture = "DEFENSE";
+	else
+		g_posture = "COUNTERATTACK";
+	end
+
+	if g_postureLogName ~= g_posture then
+		Log("WAR POSTURE -> %s (atWarMajor=%s lostCity=%s milCollapse=%s defcity=%s)",
+			g_posture, tostring(atWarMajor), tostring(lostCity),
+			tostring(militaryCollapsed), tostring(g_defcity ~= nil));
+		g_postureLogName = g_posture;
+	end
+
+	-- 6) Auto-target: only in COUNTERATTACK, only when no target is set. NEVER
+	--    overrides a manual ATTACK (that sets g_targetAuto=false). Drops its OWN
+	--    auto target when we leave COUNTERATTACK; a manual target is untouched.
+	if g_posture == "COUNTERATTACK" and g_target == nil then
+		local t = PickCounterattackTarget(pPlayer, eLocalPlayer, pDiplo, pVis, threats, army);
+		if t ~= nil then
+			g_target = t; g_targetAuto = true;
+			Log("AUTO-TARGET -> %s at %d,%d (counterattack)", t.name, t.x, t.y);
+			RefreshUI();
+		end
+	elseif g_target ~= nil and g_targetAuto and g_posture ~= "COUNTERATTACK" then
+		Log("auto-target %s dropped (posture=%s)", g_target.name, g_posture);
+		g_target = nil; g_targetAuto = false;
+		RefreshUI();
+	end
 end
 
 -- ------------------------------------------------------------- main pass ----
@@ -3674,46 +3990,30 @@ local function RunAutomation()
 		if plot == nil or not IsEnemyCityPlot(plot, eLocalPlayer, pDiplo, pVis) then
 			Log("target %s no longer a hostile city (taken, destroyed, or peace) -- standing down", g_target.name);
 			g_target = nil;
+			g_targetAuto = false;
 			RefreshUI();
 		end
 	end
 
 	local threats = BuildThreatCache(eLocalPlayer, pDiplo, pVis);
 
-	-- Threatened-city scan (#25): the own city closest to an enemy within
-	-- CITY_DEFENSE_RADIUS. Non-nil flips nearby soldiers into defense mode and
-	-- vetoes settler production for the duration.
-	g_defcity = nil;
-	if threats ~= nil and #threats > 0 then
-		local okDC, cities = pcall(function() return pPlayer:GetCities(); end);
-		if okDC and cities ~= nil then
-			for _, pCity in cities:Members() do
-				-- LAND threats only (audit #11): a barb galley cruising the
-				-- coast flipped empire-wide defense mode that melee defenders
-				-- can never resolve -- converge/hold/settler-freeze forever.
-				-- The production override below keeps its own any-domain scan
-				-- (it can answer boats with ranged builds; soldiers cannot).
-				local d = NearestThreatDist(threats, pCity:GetX(), pCity:GetY(), true);
-				if d ~= nil and d <= CITY_DEFENSE_RADIUS
-				   and (g_defcity == nil or d < g_defcity.dist) then
-					g_defcity = { x = pCity:GetX(), y = pCity:GetY(),
-					              name = pCity:GetName(), dist = d };
-				end
-			end
-		end
-		if g_defcity ~= nil
-		   and (g_defLogName ~= g_defcity.name or g_defLogDist ~= g_defcity.dist) then
-			-- Log on CHANGE only: the every-pass repeat was drowning the log.
-			Log("CITY UNDER THREAT: %s (enemy %d out) -- defense mode on",
-				tostring(g_defcity.name), g_defcity.dist);
-			g_defLogName, g_defLogDist = g_defcity.name, g_defcity.dist;
-		end
-	end
+	-- (Threatened-city scan MOVED into EvaluateWarPosture below: the turtle-widened
+	-- defense radius must be known before the scan runs, so posture computes it. It
+	-- sets g_defcity exactly as before -- everything downstream is unchanged.)
 
 	-- One army snapshot per pass, taken BEFORE anything moves: every unit must
 	-- judge cohesion against the same picture, or the first unit to move shifts
 	-- the rally point under the feet of the next one and they chase each other.
 	local army = BuildArmyCache(pPlayer);
+
+	-- WAR BRAIN (Anthony live 2026-07-18: conquered while the mod only defended).
+	-- One call computes g_posture (PEACE/DEFENSE/COUNTERATTACK/TURTLE), runs the
+	-- threatened-city scan into g_defcity (turtle-widened radius when losing), and
+	-- -- in COUNTERATTACK with no manual target -- auto-picks a city to retake or
+	-- assault into g_target. Runs AFTER the army cache (the target picker and the
+	-- siege-mass gate both read it); BEFORE strikes/production/the unit loop so all
+	-- of them see g_defcity/g_posture/g_target already set.
+	EvaluateWarPosture(pPlayer, eLocalPlayer, pDiplo, pVis, threats, army);
 
 	-- Free damage first (#29): every city/encampment strike that CAN fire, fires.
 	if g_armies then
@@ -3983,6 +4283,12 @@ local function EmitTelemetry(pPlayer)
 		end
 	end
 
+	-- WAR BRAIN trend (persistent, NOT reset at TurnBegin -- it IS the trend):
+	-- append this turn's alive-combat count, keep the last WAR_MIL_WINDOW. Read by
+	-- EvaluateWarPosture's militaryCollapsed() -- a >40%-off-peak drop forces TURTLE.
+	g_milHistory[#g_milHistory + 1] = nMil;
+	while #g_milHistory > WAR_MIL_WINDOW do table.remove(g_milHistory, 1) end
+
 	print(string.format(
 		"[ABA-TEL] turn=%d era=%d score=%d cities=%d pop=%d units=%d mil=%d sci=%.1f cul=%.1f gpt=%.1f gold=%d fpt=%.1f techs=%d",
 		turn, era, score, nCities, pop, nUnits, nMil, sci, cul, gpt, gold, fpt, nTech));
@@ -4233,6 +4539,7 @@ local function OnAttack()
 	-- Committing an assault implies you want the army moving: turn the switches
 	-- on rather than silently doing nothing behind an OFF master toggle.
 	g_target = g_candidate;
+	g_targetAuto = false;   -- a manual ATTACK is Anthony's call; posture must never auto-drop it
 	g_master = true;  GameConfiguration.SetValue(KEY_MASTER, true);
 	g_armies = true;  GameConfiguration.SetValue(KEY_ARMIES, true);
 
@@ -4245,6 +4552,7 @@ end
 
 local function OnClearTarget()
 	g_target = nil;
+	g_targetAuto = false;
 	g_tasked = {};
 	UI.PlaySound("Main_Menu_Mouse_Over");
 	RefreshUI();
@@ -4273,6 +4581,7 @@ local function LoadPrefs()
 	-- Attack targets are deliberately NOT persisted: loading a save should never
 	-- resume a war march you gave the order for two sessions ago.
 	g_target, g_candidate = nil, nil;
+	g_targetAuto = false;
 	RefreshUI();
 	UpdateStatus(0, 0);
 end
@@ -4320,6 +4629,8 @@ local function OnShutdown()
 	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "inflight",    g_inflight);
 	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "tasked",      g_tasked);
 	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "collapsed",   g_collapsed);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "targetAuto",  g_targetAuto);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "milHistory",  g_milHistory);
 end
 
 local function OnGameDebugReturn(context, contextTable)
@@ -4335,6 +4646,8 @@ local function OnGameDebugReturn(context, contextTable)
 		g_inflight    = contextTable["inflight"]    or {};
 		g_tasked      = contextTable["tasked"]      or {};
 		g_collapsed   = contextTable["collapsed"] == true;
+		g_targetAuto  = contextTable["targetAuto"] == true;
+		g_milHistory  = contextTable["milHistory"] or {};
 		if Controls.ABA_Body ~= nil then Controls.ABA_Body:SetHide(g_collapsed) end
 	end);
 end

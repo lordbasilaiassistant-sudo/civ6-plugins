@@ -11,8 +11,8 @@
        parent and land off-screen. Anchoring left and setting OffsetX from the real
        screen width in Lua puts it on the right correctly whether the parent is
        full-size or 0x0. -->
-  <Container ID="ABA_Root" Anchor="L,T" Offset="0,190" Size="220,378">
-    <Grid ID="ABA_Frame" Anchor="L,T" Size="220,378" MinSize="220,60" Texture="Controls_GossipContainer" SliceTextureSize="32,32" SliceCorner="16,16" Color="36,49,59,255">
+  <Container ID="ABA_Root" Anchor="L,T" Offset="0,190" Size="220,400">
+    <Grid ID="ABA_Frame" Anchor="L,T" Size="220,400" MinSize="220,60" Texture="Controls_GossipContainer" SliceTextureSize="32,32" SliceCorner="16,16" Color="36,49,59,255">
       <Stack ID="ABA_Stack" Anchor="L,T" Offset="10,8" StackGrowth="Down" StackPadding="4">
 
         <Button ID="ABA_HeaderBtn" Size="196,24" ToolTip="Click to collapse / expand the Auto Commander panel.">
@@ -45,6 +45,7 @@
             <Label ID="ABA_AdvanceLbl" Anchor="C,C" Style="BodyText12" String="Advance: ON"/>
           </Button>
 
+          <Label ID="ABA_PostureLbl" Anchor="C,C" Style="BodyText14" String="War: PEACE"/>
           <Box ID="ABA_Sep" Size="196,1" Color="0x40FFFFFF"/>
 
           <Label ID="ABA_TargetHint" Anchor="L,T" Offset="2,0" Style="BodyText12" WrapWidth="192" String="Click an enemy city, then ATTACK."/>

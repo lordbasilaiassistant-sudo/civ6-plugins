@@ -3137,7 +3137,14 @@ local function AutomateProduction(pPlayer, threats)
 			local function CanCityProduce(h)
 				local okQ, pQueue = pcall(function() return pCity:GetBuildQueue(); end);
 				if not okQ or pQueue == nil then return false end
-				local okCan, can = pcall(function() return pQueue:CanProduce(h, true); end);
+				-- STRICT test -- can the city start this RIGHT NOW. The old
+				-- CanProduce(h, true) is the panel's VISIBILITY check: it
+				-- passed units whose strategic resources we lack, the engine
+				-- silently dropped the order, and the defense override re-issued
+				-- UNIT_MAN_AT_ARMS forever while Tlacopan's chooser sat open
+				-- (live t177). The panel's own disable test is
+				-- CanProduce(h, false, true) -- ProductionPanel.lua:1912/2038.
+				local okCan, can = pcall(function() return pQueue:CanProduce(h, false, true); end);
 				return okCan and can == true;
 			end
 
@@ -3233,7 +3240,7 @@ local function AutomateProduction(pPlayer, threats)
 				if okD and cityDistricts ~= nil then
 					for dRow in GameInfo.Districts() do
 						local okP, pill = pcall(function() return cityDistricts:IsPillaged(dRow.Index); end);
-						if okP and pill == true then
+						if okP and pill == true and CanCityProduce(dRow.Hash) then
 							local tP = {};
 							tP[CityOperationTypes.PARAM_DISTRICT_TYPE] = dRow.Hash;
 							tP[CityOperationTypes.PARAM_INSERT_MODE]   = CityOperationTypes.VALUE_EXCLUSIVE;
@@ -3249,7 +3256,7 @@ local function AutomateProduction(pPlayer, threats)
 					if okB and cityBuildings ~= nil then
 						for bRow in GameInfo.Buildings() do
 							local okP, pill = pcall(function() return cityBuildings:IsPillaged(bRow.Hash); end);
-							if okP and pill == true then
+							if okP and pill == true and CanCityProduce(bRow.Hash) then
 								local tP = {};
 								tP[CityOperationTypes.PARAM_BUILDING_TYPE] = bRow.Hash;
 								tP[CityOperationTypes.PARAM_INSERT_MODE]   = CityOperationTypes.VALUE_EXCLUSIVE;

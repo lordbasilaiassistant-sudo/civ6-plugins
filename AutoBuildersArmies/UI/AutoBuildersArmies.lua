@@ -523,15 +523,14 @@ local function EnsureOrdered(pUnit, why, retryNextTurn)
 		Log("UNSTUCK %s %d: %s -> alert", uType, id, why);
 		return true;
 	end
-	-- Great people are exempt from the step-out lever: it MOVED a Great Writer
-	-- off its activation plot live (2026-07-18) -- for a GP, standing still and
-	-- shouting beats wandering off mission.
-	local okGP, isGP = pcall(function()
-		local g = pUnit:GetGreatPerson();
-		return g ~= nil and g:IsGreatPerson() == true;
-	end);
+	-- Step-out stays available for great people (reversed 2026-07-18 evening,
+	-- live: Machiavelli refused skip AND fortify AND sleep AND alert -- with
+	-- the GP exemption in place there was NO lever left and the turn blocked
+	-- until Anthony clicked skip by hand). Walking one tile off an activation
+	-- plot costs a turn of walking back; blocking END TURN costs the whole
+	-- game. The slot-census sleep upstream makes this genuinely last-resort.
 	local pPlayer = Players[Game.GetLocalPlayer()];
-	if pPlayer ~= nil and not (okGP and isGP) then
+	if pPlayer ~= nil then
 		local ux, uy = pUnit:GetX(), pUnit:GetY();
 		local okR, reach = pcall(function() return UnitManager.GetReachableMovement(pUnit); end);
 		if okR and reach ~= nil then
@@ -1795,18 +1794,56 @@ local function AutomateGreatPerson(pUnit, pPlayer, gp)
 		end
 	end
 
-	-- Walk to the nearest activation plot.
+	-- Walk to the nearest activation plot -- skipping plots OCCUPIED by another
+	-- of our civilians (live: Donatello marched at sleeping Machiavelli's tile
+	-- to the re-task cap, every turn -- two civilians cannot stack, the engine
+	-- accepts the move and then drops it).
 	local best, bestD = nil, 9999;
 	for _, idx in ipairs(plots) do
 		local plot = Map.GetPlotByIndex(idx);
 		if plot ~= nil then
-			local d = Map.GetPlotDistance(pUnit:GetX(), pUnit:GetY(), plot:GetX(), plot:GetY());
-			if d < bestD then bestD, best = d, plot end
+			local blocked = false;
+			if not (plot:GetX() == pUnit:GetX() and plot:GetY() == pUnit:GetY()) then
+				local okL, lst = pcall(function()
+					return Units.GetUnitsInPlotLayerID(plot:GetX(), plot:GetY(), MapLayers.ANY);
+				end);
+				if okL and lst ~= nil then
+					for _, u2 in ipairs(lst) do
+						if u2:GetOwner() == pPlayer:GetID() and u2:GetID() ~= id then
+							local i2 = GameInfo.Units[u2:GetUnitType()];
+							if i2 ~= nil and i2.FormationClass == "FORMATION_CLASS_CIVILIAN" then
+								blocked = true; break;
+							end
+						end
+					end
+				end
+			end
+			if not blocked then
+				local d = Map.GetPlotDistance(pUnit:GetX(), pUnit:GetY(), plot:GetX(), plot:GetY());
+				if d < bestD then bestD, best = d, plot end
+			end
 		end
 	end
 	if best ~= nil and MoveTo(pUnit, best:GetX(), best:GetY()) then
-		Log("great person %d (%s): heading to activation plot %d,%d", id, clsName, best:GetX(), best:GetY());
+		LogOnce("gphead:" .. id, "great person %d (%s): heading to activation plot %d,%d", id, clsName, best:GetX(), best:GetY());
 		return "move";
+	end
+	-- Every activation plot is occupied/unreachable: same treatment as
+	-- no-plots -- flag the slot need if applicable and let the strikes park us.
+	local objType3 = GP_WORK_OBJECT[clsName];
+	if objType3 ~= nil and CountEmptyCompatibleSlots(pPlayer, objType3) <= 0 then
+		g_gpNeedSlot = objType3;
+	end
+	local n3 = (g_gpStrikes[id] or 0) + 1;
+	g_gpStrikes[id] = n3;
+	LogOnce("gpwalk:" .. id, "great person %d (%s): all activation plots occupied/unreachable (strike %d)", id, clsName, n3);
+	if n3 >= 3 then
+		local opSleep = ResolveOp(UnitOperationTypes.SLEEP, "UNITOPERATION_SLEEP");
+		if CanStart(pUnit, opSleep) then
+			IssueOp(pUnit, opSleep);
+			Log("great person %d (%s): SLEEPING until a build completes", id, clsName);
+			return "gp-sleep";
+		end
 	end
 	return nil;
 end

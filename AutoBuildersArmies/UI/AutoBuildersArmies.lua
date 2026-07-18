@@ -204,6 +204,28 @@ local function Safe(name, fn)
 	end;
 end
 
+-- ------------------------------------------------ hot-reload lifecycle ------
+--
+-- This build hot-reloads mod Lua on file change (DebugHotloadCache). That is
+-- the LIVE-PATCH channel (#34): a validated file atomically renamed over the
+-- installed copy applies mid-game, no restart. Two rules make it safe, both
+-- learned from the base game's own files:
+--   * The engine does NOT detach Events handlers when a context reloads --
+--     old closures dangle and keep firing (Firaxis's own comment,
+--     PlotToolTip.lua:962). So every subscription goes through Sub() below,
+--     and OnShutdown removes them all before the new instance wires in.
+--   * State survives via the always-on DebugHotloadCache context
+--     (LuaEvents.GameDebug_AddValue / GetValues / Return -- CityPanel.lua:
+--     737-793 is the canonical save/restore pair). Data only, no functions.
+local RELOAD_CACHE_ID = "AutoBuildersArmies";
+local g_eventSubs = {};   -- { {ev=<event>, fn=<wrapped handler>}, ... }
+
+local function Sub(ev, name, fn)
+	local wrapped = Safe(name, fn);
+	g_eventSubs[#g_eventSubs + 1] = { ev = ev, fn = wrapped };
+	ev.Add(wrapped);
+end
+
 local KEY_MASTER   = "ABA_MASTER"
 local KEY_BUILDERS = "ABA_BUILDERS"
 local KEY_ARMIES   = "ABA_ARMIES"
@@ -3976,7 +3998,107 @@ local function LoadPrefs()
 	UpdateStatus(0, 0);
 end
 
+-- A finished build re-opens that city for orders within the same turn, and may
+-- have added great-work slots for a sleeping great person (#27).
+local function OnCityProductionCompleted(playerID, cityID)
+	if playerID == Game.GetLocalPlayer() then
+		g_cityOrdered[cityID] = nil;
+		if next(g_gpStrikes) ~= nil then
+			local pP = Players[playerID];
+			local okU, us = pcall(function() return pP:GetUnits(); end);
+			if okU and us ~= nil then
+				local opWake = ResolveOp(UnitOperationTypes.WAKE, "UNITOPERATION_WAKE");
+				for _, u in us:Members() do
+					local uid = u:GetID();
+					if (g_gpStrikes[uid] or 0) >= 3 then
+						g_gpStrikes[uid] = nil;
+						if CanStart(u, opWake) then IssueOp(u, opWake) end
+						Log("great person %d: a build completed -> re-checking activation", uid);
+					end
+				end
+			end
+		end
+	end
+	RequestPass();
+end
+
 -- --------------------------------------------------------------- init -------
+
+-- Everything cached here is plain data (functions cannot cross a hotload --
+-- AdvisorPopup.lua:479). What is NOT cached resets safely: per-turn debounce
+-- tables re-derive within one pass; toggles live in GameConfiguration.
+local function OnShutdown()
+	for _, s in ipairs(g_eventSubs) do
+		pcall(function() s.ev.Remove(s.fn) end);
+	end
+	g_eventSubs = {};
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "target",      g_target);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "candidate",   g_candidate);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "settlerPlan", g_settlerPlan);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "rallyStuck",  g_rallyStuck);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "gpStrikes",   g_gpStrikes);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "plotSkip",    g_plotSkip);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "inflight",    g_inflight);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "tasked",      g_tasked);
+	LuaEvents.GameDebug_AddValue(RELOAD_CACHE_ID, "collapsed",   g_collapsed);
+end
+
+local function OnGameDebugReturn(context, contextTable)
+	if context ~= RELOAD_CACHE_ID or contextTable == nil then return end
+	-- pcall like CityPanel.lua:792: a bad cache must never kill the reload.
+	pcall(function()
+		g_target      = contextTable["target"];
+		g_candidate   = contextTable["candidate"];
+		g_settlerPlan = contextTable["settlerPlan"] or {};
+		g_rallyStuck  = contextTable["rallyStuck"]  or {};
+		g_gpStrikes   = contextTable["gpStrikes"]   or {};
+		g_plotSkip    = contextTable["plotSkip"]    or {};
+		g_inflight    = contextTable["inflight"]    or {};
+		g_tasked      = contextTable["tasked"]      or {};
+		g_collapsed   = contextTable["collapsed"] == true;
+		if Controls.ABA_Body ~= nil then Controls.ABA_Body:SetHide(g_collapsed) end
+	end);
+end
+
+-- ALL event wiring lives here, through Sub(), so OnShutdown can unhook every
+-- one of them by reference. Called by the engine via OnInit on every load.
+local function LateInitialize()
+	Sub(Events.LoadGameViewStateDone,        "LoadPrefs",        LoadPrefs);
+	Sub(Events.LocalPlayerTurnBegin,         "TurnBegin",        OnLocalPlayerTurnBegin);
+	Sub(Events.GameCoreEventPublishComplete, "PublishComplete",  OnPublishComplete);
+	-- Both operation-resolution events AND UnitCommandStarted go through the
+	-- untasking handler: commands (PROMOTE, ENTER_FORMATION, ACTIVATE, UPGRADE)
+	-- resolve via their own event, not the operation queue -- without it every
+	-- command froze its unit as order-in-flight all turn (live x11).
+	Sub(Events.UnitOperationsCleared,        "UnitOpsCleared",   OnUnitOpResolved);
+	Sub(Events.UnitOperationSegmentComplete, "UnitOpSegment",    OnUnitOpResolved);
+	Sub(Events.UnitCommandStarted,           "UnitCmdStarted",   OnUnitOpResolved);
+	Sub(Events.UnitMoveComplete,             "UnitMoveComplete", OnUnitDone);
+	Sub(Events.EndTurnBlockingChanged,       "BlockingChanged",  OnEndTurnBlockingChanged);
+	Sub(Events.UnitAddedToMap,               "UnitAddedToMap",   OnUnitAddedToMap);
+	Sub(Events.CitySelectionChanged,         "CitySelChanged",   OnCitySelectionChanged);
+	-- Research/civics free up mid-turn; cities go idle mid-turn; founding is
+	-- async (the pass that ordered the settler ran before the city existed).
+	Sub(Events.ResearchCompleted,            "ResearchDone",     RequestPass);
+	Sub(Events.CivicCompleted,               "CivicDone",        RequestPass);
+	Sub(Events.CityAddedToMap,               "CityAdded",        RequestPass);
+	Sub(Events.CityProductionCompleted,      "ProductionDone",   OnCityProductionCompleted);
+	Sub(LuaEvents.GameDebug_Return,          "DebugReturn",      OnGameDebugReturn);
+end
+
+local function OnInit(isReload)
+	LateInitialize();
+	if isReload then
+		-- LIVE PATCH just applied (#34). LoadGameViewStateDone will not re-fire,
+		-- so re-read prefs here (this resets g_target -- the cache restore that
+		-- follows brings it back; LuaEvents are synchronous).
+		LoadPrefs();
+		LuaEvents.GameDebug_GetValues(RELOAD_CACHE_ID);
+		Log("HOTLOAD complete -- new code live, state restored");
+		RefreshUI();
+		RequestPass();
+	end
+end
 
 function Initialize()
 	-- Multiplayer: disable completely (UI-context orders desync MP).
@@ -4044,62 +4166,12 @@ function Initialize()
 	Bind(Controls.ABA_AttackBtn,   "btn:attack",   OnAttack);
 	Bind(Controls.ABA_ClearBtn,    "btn:clear",    OnClearTarget);
 
-	-- Every handler is wrapped: if one throws, the log names it and the rest live.
-	Events.LoadGameViewStateDone.Add(       Safe("LoadPrefs",        LoadPrefs));
-	Events.LocalPlayerTurnBegin.Add(        Safe("TurnBegin",        OnLocalPlayerTurnBegin));
-	Events.GameCoreEventPublishComplete.Add(Safe("PublishComplete",  OnPublishComplete));
-	-- Both resolution events go through the UNTASKING handler, not a bare
-	-- re-pass: re-sweeping while the unit is still in g_tasked just skips it
-	-- again -- that was the frozen-builder bug in one line.
-	Events.UnitOperationsCleared.Add(       Safe("UnitOpsCleared",   OnUnitOpResolved));
-	Events.UnitOperationSegmentComplete.Add(Safe("UnitOpSegment",    OnUnitOpResolved));
-	-- COMMANDS resolve through their own event, NOT the operation queue (audit
-	-- #1/#4, live: "order-in-flight" x11): without this, every RequestCommand
-	-- (PROMOTE, ENTER/EXIT_FORMATION, ACTIVATE, UPGRADE) froze its unit for the
-	-- rest of the turn. Same handler signature (player, unitID, hCommand,
-	-- iData1) -- verified UnitPanel.lua:2452.
-	Events.UnitCommandStarted.Add(          Safe("UnitCmdStarted",   OnUnitOpResolved));
-	Events.UnitMoveComplete.Add(            Safe("UnitMoveComplete", OnUnitDone));
-	Events.EndTurnBlockingChanged.Add(      Safe("BlockingChanged",  OnEndTurnBlockingChanged));
-	Events.UnitAddedToMap.Add(              Safe("UnitAddedToMap",   OnUnitAddedToMap));
-	Events.CitySelectionChanged.Add(        Safe("CitySelChanged",   OnCitySelectionChanged));
-
-	-- Research/civics free up mid-turn, not just at turn start; catch those the
-	-- moment they land so a slot is never left idle.
-	Events.ResearchCompleted.Add(           Safe("ResearchDone",     RequestPass));
-	Events.CivicCompleted.Add(              Safe("CivicDone",        RequestPass));
-
-	-- Cities go idle mid-turn too, and founding is ASYNC: the pass that ordered
-	-- the settler ran before the city existed, so without these two events a
-	-- brand-new city sat with an empty queue until next turn (observed live:
-	-- Rome founded turn 1, no production chosen).
-	Events.CityAddedToMap.Add(              Safe("CityAdded",        RequestPass));
-	-- A finished build re-opens that city for orders within the same turn --
-	-- clear its debounce flag or it would wait for the next turn.
-	Events.CityProductionCompleted.Add(     Safe("ProductionDone",   function(playerID, cityID)
-		if playerID == Game.GetLocalPlayer() then
-			g_cityOrdered[cityID] = nil;
-			-- A finished build may have added great-work slots: wake any great
-			-- person the 3-strike activation breaker put to sleep so it
-			-- re-checks (#27). WAKE resolved defensively -- nil op = no-op.
-			if next(g_gpStrikes) ~= nil then
-				local pP = Players[playerID];
-				local okU, us = pcall(function() return pP:GetUnits(); end);
-				if okU and us ~= nil then
-					local opWake = ResolveOp(UnitOperationTypes.WAKE, "UNITOPERATION_WAKE");
-					for _, u in us:Members() do
-						local uid = u:GetID();
-						if (g_gpStrikes[uid] or 0) >= 3 then
-							g_gpStrikes[uid] = nil;
-							if CanStart(u, opWake) then IssueOp(u, opWake) end
-							Log("great person %d: a build completed -> re-checking activation", uid);
-						end
-					end
-				end
-			end
-		end
-		RequestPass();
-	end));
+	-- Hot-reload lifecycle (#34): ALL event wiring lives in LateInitialize --
+	-- the engine calls OnInit on every load (isReload=true on a live patch),
+	-- and OnShutdown unhooks everything + caches state, so a mid-game file
+	-- swap neither doubles handlers nor loses the war march.
+	ContextPtr:SetInitHandler(OnInit);
+	ContextPtr:SetShutdown(OnShutdown);
 
 	RefreshUI();
 end

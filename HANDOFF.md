@@ -73,8 +73,14 @@ Turn won't end / needs manual clicks. Diagnosed causes, in likely frequency orde
 5. **Every silent skip must log a reason** — "idle but nothing ordered (N recs, M usable)" style lines found
    3 root causes tonight in minutes each.
 6. Lua file-level locals resolve by declaration order; a later-declared local silently compiles as nil global.
-7. Restart the game to load Lua changes cleanly. **CORRECTION (2026-07-17, learned by a
-   Runtime-Error flood): this build DOES hot-reload mod Lua on file change (DebugHotloadCache)
-   — which is WORSE, because it picks up half-written files mid-edit and wires nil handlers.
-   HARD RULE: while a game is running, edit ONLY the repo copy; copy to the (WinApp) Mods dir
-   between sessions, validate, then relaunch.**
+7. **LIVE PATCHING (2026-07-18, supersedes the 07-17 hard rule):** the build's hot-reload
+   (DebugHotloadCache) is now HARNESSED, not feared. The mod implements the base game's own
+   lifecycle (SetInitHandler/OnInit(isReload) + SetShutdown unhooking every Sub()-registered
+   handler + GameDebug_AddValue/Return state cache — idioms cited from CityPanel.lua:737-793,
+   PlotToolTip.lua:962). Protocol for Lua-only changes while the game runs:
+   `py tools/hotpatch.py` — validates FIRST, then atomically renames over the installed copy;
+   confirm `[ABA] HOTLOAD complete` in Lua.log. NEVER edit the installed file in place
+   (half-written files still wire nil handlers — the 07-17 flood); the atomic rename IS the
+   fix for that. .modinfo/.xml changes and the harness itself still need a between-sessions
+   install + relaunch. Inbound-command/tuner bridge: issue #34 (EnableTuner flipped on
+   2026-07-18; probe with tools/tuner_probe.py after next launch).

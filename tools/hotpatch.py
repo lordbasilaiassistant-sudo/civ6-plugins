@@ -52,7 +52,10 @@ def main() -> int:
     tmp = DST + ".incoming"
     shutil.copyfile(SRC, tmp)
     os.replace(tmp, DST)
-    print("HOT-PATCH INSTALLED (atomic). If the game is running, watch for:")
+    # The engine's watcher fires on LAST-WRITE changes, not renames -- verified
+    # live 2026-07-18: the rename alone did nothing, a touch reloaded instantly.
+    os.utime(DST, None)
+    print("HOT-PATCH INSTALLED (atomic + touch). If the game is running, watch for:")
     print('  [ABA] HOTLOAD complete -- new code live, state restored')
     print(r"  in %LOCALAPPDATA%\Firaxis Games\Sid Meier's Civilization VI\Logs\Lua.log")
     return 0

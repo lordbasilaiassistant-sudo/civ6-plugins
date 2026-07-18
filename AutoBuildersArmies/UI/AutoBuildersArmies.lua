@@ -102,6 +102,10 @@ local g_districtNoPlot = {}   -- ["cityID:hash"]=true, district had no legal plo
 local g_envoyDone   = false -- envoys dumped this turn. GetTokensToGive does not
                             -- update until the async op lands, so a second pass in
                             -- the same turn would spend tokens we no longer have.
+local g_gpNeedSlot = nil    -- GreatWorkObjectType a claimed GP is waiting on
+                            -- (#27, live: Machiavelli with no writing slot
+                            -- anywhere). Production queues the cheapest
+                            -- slot-providing building; cleared when ordered.
 local g_upgraded  = {}      -- [unitID]=true, upgrade requested this turn (async, #30)
 local g_upgradeCount = 0    -- upgrades issued this turn (budget cap)
 local g_cityBought = {}     -- [cityID]=true, emergency gold-buy issued this turn.
@@ -932,7 +936,11 @@ local function WrongImprovementForResource(plot)
 end
 
 -- Nearest reachable, unimproved tile the game recommends improving.
-local function BestBuildTargetPlot(pPlayer, pUnit)
+-- `linked` widens the safety envelope: an escorted (formation-linked) builder
+-- may work the full ring-3; an unlinked one stays within 2 tiles of a city --
+-- under the garrison/city-strike umbrella (Anthony: "make sure they are
+-- always protected").
+local function BestBuildTargetPlot(pPlayer, pUnit, linked)
 	local unitCompID = pUnit:GetComponentID();
 	local best, bestTurns = nil, 9999;
 	local seen = {};
@@ -955,7 +963,20 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 						-- destination claims as the fallback scan (audit 2026-07-18):
 						-- without this, a refused MOVE_TO blacklisted the plot and
 						-- the advisor re-elected it anyway, every pass, forever.
-						if plot ~= nil and plot:GetImprovementType() == -1 and not plot:IsWater() and not plot:IsImpassable()
+						-- OWNERSHIP (Anthony live t88: "builders venture away from
+						-- actual owned land"): the advisor recommends plots we do
+						-- not own yet -- builders can only ever work OUR tiles.
+						-- PROTECTION: unlinked builders stay <=2 from a city.
+						local okOwn = plot ~= nil and plot:GetOwner() == pPlayer:GetID();
+						local okSafe = false;
+						if okOwn then
+							local home = NearestOwnCityPlot(pPlayer, plot:GetX(), plot:GetY());
+							local dHome = (home ~= nil)
+								and Map.GetPlotDistance(plot:GetX(), plot:GetY(), home:GetX(), home:GetY()) or 99;
+							okSafe = dHome <= (linked and 3 or 2);
+						end
+						if okOwn and okSafe
+						   and plot:GetImprovementType() == -1 and not plot:IsWater() and not plot:IsImpassable()
 						   and (g_plotSkip[loc] == nil or g_plotSkip[loc] <= Game.GetCurrentGameTurn())
 						   and g_claims[loc] == nil then
 							local okP, pathInfo = pcall(function()
@@ -1023,7 +1044,7 @@ local function BestBuildTargetPlot(pPlayer, pUnit)
 		for dx = -3, 3 do
 			for dy = -3, 3 do
 				local plot = Map.GetPlot(cx + dx, cy + dy);
-				if plot ~= nil and Map.GetPlotDistance(cx, cy, plot:GetX(), plot:GetY()) <= 3
+				if plot ~= nil and Map.GetPlotDistance(cx, cy, plot:GetX(), plot:GetY()) <= (linked and 3 or 2)
 				   and plot:GetOwner() == eOwner
 				   and not plot:IsWater() and not plot:IsImpassable()
 				   -- Pillaged improvements count as work too (Anthony: "they
@@ -1214,7 +1235,7 @@ local function AutomateBuilder(pUnit, pPlayer, threats)
 	--    (live, Delhi: 3 refused candidates = 3 wasted turns under the old
 	--    one-try-per-turn shape; issue #13).
 	for try = 1, 3 do
-		local target = BestBuildTargetPlot(pPlayer, pUnit);
+		local target = BestBuildTargetPlot(pPlayer, pUnit, linked);
 		if target == nil then break end
 		local tParams = {
 			[UnitOperationTypes.PARAM_X] = target:GetX(),
@@ -1315,16 +1336,13 @@ local function AutomateSettler(pUnit, pPlayer, threats)
 		Log("settler %d: founding city at %d,%d", id, ux, uy);
 		return "found";
 	end
-	local escorted = false;
-	local okE, ownUnits = pcall(function() return pPlayer:GetUnits(); end);
-	if okE and ownUnits ~= nil then
-		for _, u in ownUnits:Members() do
-			if not u:IsDead() and IsCombatUnit(u) and not IsRecon(u)
-			   and Map.GetPlotDistance(ux, uy, u:GetX(), u:GetY()) <= 1 then
-				escorted = true; break;
-			end
-		end
-	end
+	-- LINKED, not merely nearby (Anthony live t88: "settlers venture alone
+	-- still"): soldier-within-1 at departure let the pair drift apart on a
+	-- multi-turn march. A formation link is ONE stack -- the escort cannot
+	-- fall behind. The escort branch (B2) delivers a soldier onto this tile;
+	-- step 0b links it; only then does travel unlock.
+	local okEsc, escN = pcall(function() return pUnit:GetFormationUnitCount(); end);
+	local escorted = (okEsc and escN ~= nil and escN > 1);
 	-- Scope the defense hold to the ACTUAL danger zone (audit #6): the old
 	-- blanket g_defcity test froze every settler empire-wide whenever any city
 	-- anywhere saw a barbarian -- a war on another continent must not stall
@@ -1598,6 +1616,74 @@ local function GetGP(pUnit)
 	return (okIs and is == true) and gp or nil;
 end
 
+-- Writers/Artists/Musicians activate INTO an empty great-work slot; without
+-- one there are no activation plots at all and the GP just churns (live:
+-- Machiavelli). Census APIs are the game's own (GreatWorksOverview.lua:117-131
+-- HasBuilding+GetNumGreatWorkSlots+GetGreatWorkSlotType, :208 empty == -1;
+-- slot-accepts-object via GreatWork_ValidSubTypes; slot buildings enumerated
+-- from Building_GreatWorks).
+local GP_WORK_OBJECT = {
+	GREAT_PERSON_CLASS_WRITER   = "GREATWORKOBJECT_WRITING",
+	GREAT_PERSON_CLASS_ARTIST   = "GREATWORKOBJECT_SCULPTURE",
+	GREAT_PERSON_CLASS_MUSICIAN = "GREATWORKOBJECT_MUSIC",
+};
+
+local g_slotAccepts = nil;   -- [GreatWorkSlotType][GreatWorkObjectType] = true
+local function SlotAccepts(slotType, objectType)
+	if g_slotAccepts == nil then
+		g_slotAccepts = {};
+		for row in GameInfo.GreatWork_ValidSubTypes() do
+			g_slotAccepts[row.GreatWorkSlotType] = g_slotAccepts[row.GreatWorkSlotType] or {};
+			g_slotAccepts[row.GreatWorkSlotType][row.GreatWorkObjectType] = true;
+		end
+	end
+	local t = g_slotAccepts[slotType];
+	return t ~= nil and t[objectType] == true;
+end
+
+local function CountEmptyCompatibleSlots(pPlayer, objectType)
+	local n = 0;
+	local okC, cities = pcall(function() return pPlayer:GetCities(); end);
+	if not okC or cities == nil then return 0 end
+	for _, pCity in cities:Members() do
+		local okB, bldgs = pcall(function() return pCity:GetBuildings(); end);
+		if okB and bldgs ~= nil then
+			for row in GameInfo.Building_GreatWorks() do
+				local b = GameInfo.Buildings[row.BuildingType];
+				local okH, has = pcall(function() return b ~= nil and bldgs:HasBuilding(b.Index); end);
+				if okH and has == true then
+					local okN, nSlots = pcall(function() return bldgs:GetNumGreatWorkSlots(b.Index); end);
+					for i = 0, (okN and nSlots or 0) - 1 do
+						local okE, inSlot = pcall(function() return bldgs:GetGreatWorkInSlot(b.Index, i); end);
+						local okT, sType  = pcall(function() return bldgs:GetGreatWorkSlotType(b.Index, i); end);
+						local sRow = (okT and sType ~= nil) and GameInfo.GreatWorkSlotTypes[sType] or nil;
+						if okE and inSlot == -1 and sRow ~= nil
+						   and SlotAccepts(sRow.GreatWorkSlotType, objectType) then
+							n = n + 1;
+						end
+					end
+				end
+			end
+		end
+	end
+	return n;
+end
+
+-- Cheapest non-wonder building that provides a compatible slot (the
+-- Amphitheater, for a writer). Production queues it while the GP waits.
+local function FindSlotBuildingWish(objectType)
+	local best = nil;
+	for row in GameInfo.Building_GreatWorks() do
+		if SlotAccepts(row.GreatWorkSlotType, objectType) then
+			local b = GameInfo.Buildings[row.BuildingType];
+			if b ~= nil and not (b.IsWonder == true or b.IsWonder == 1) then
+				if best == nil or (b.Cost or 9999) < (best.Cost or 9999) then best = b end
+			end
+		end
+	end
+	return best;
+end
+
 local function AutomateGreatPerson(pUnit, pPlayer, gp)
 	local id = pUnit:GetID();
 	local cls = GameInfo.GreatPersonClasses[gp:GetClass()];
@@ -1620,9 +1706,31 @@ local function AutomateGreatPerson(pUnit, pPlayer, gp)
 
 	local ok, plots = pcall(function() return gp:GetActivationHighlightPlots(); end);
 	if not ok or plots == nil or #plots == 0 then
-		-- Nowhere to activate yet (e.g. prophet before any Holy Site exists).
-		-- Skip-retry, NOT sleep: the valid plot may exist next turn.
-		Log("great person %d (%s): no activation plots yet", id, clsName);
+		-- Nowhere to activate. For writers/artists/musicians the usual reason
+		-- is NO empty compatible great-work slot anywhere (live: Machiavelli,
+		-- 4/4 moves, needs-orders forever) -- flag production to build one,
+		-- then sleep after 3 strikes; a completed build wakes us (#27).
+		local objType = GP_WORK_OBJECT[clsName];
+		if objType ~= nil and CountEmptyCompatibleSlots(pPlayer, objType) <= 0 then
+			g_gpNeedSlot = objType;
+			local n = (g_gpStrikes[id] or 0) + 1;
+			g_gpStrikes[id] = n;
+			LogOnce("gpslot:" .. id,
+				"great person %d (%s): NO empty %s slot in the empire -- production queues one (strike %d)",
+				id, clsName, objType, n);
+			if n >= 3 then
+				local opSleep = ResolveOp(UnitOperationTypes.SLEEP, "UNITOPERATION_SLEEP");
+				if CanStart(pUnit, opSleep) then
+					IssueOp(pUnit, opSleep);
+					Log("great person %d (%s): SLEEPING until a slot building completes", id, clsName);
+					return "gp-sleep";
+				end
+			end
+			return nil;
+		end
+		-- Non-slot classes (e.g. prophet before any Holy Site): skip-retry,
+		-- NOT sleep -- the valid plot may exist next turn.
+		LogOnce("gpnoplot:" .. id, "great person %d (%s): no activation plots yet", id, clsName);
 		return nil;
 	end
 
@@ -1656,6 +1764,17 @@ local function AutomateGreatPerson(pUnit, pPlayer, gp)
 					local okL, txt = pcall(function() return Locale.Lookup(s); end);
 					reasons = reasons .. " | " .. tostring(okL and txt or s);
 				end
+			end
+			-- On-plot refusal for a slot class usually means the highlighted
+			-- slot is FILLED (live: writer on the palace plot, refused, no
+			-- reason string) -- run the same census and flag production for a
+			-- new slot building, exactly like the no-plots path.
+			local objType2 = GP_WORK_OBJECT[clsName];
+			if objType2 ~= nil and CountEmptyCompatibleSlots(pPlayer, objType2) <= 0 then
+				g_gpNeedSlot = objType2;
+				LogOnce("gpslot:" .. id,
+					"great person %d (%s): refused on plot AND no empty %s slot -- production queues one",
+					id, clsName, objType2);
 			end
 			-- Structural refusals do not clear by retrying: 3 strikes -> SLEEP.
 			-- Any finished city build resets strikes and WAKES sleeping GPs
@@ -2747,7 +2866,10 @@ end
 -- So a few guardrails get a vote BEFORE the advisor. These are deliberately
 -- RATIOS, not a build order: the advisor still decides everything the ratios do
 -- not care about, and the ratios only fire when something is genuinely missing.
-local WANT_BUILDERS_PER_CITY = 1   -- a builder carries 3 charges; ~1 alive per city
+local WANT_BUILDERS_TOTAL    = 2   -- Anthony (2026-07-18): "builders are needed
+                                   -- when less than 2 builders exist and there
+                                   -- are things to do" -- TOTAL, not per city
+                                   -- (1/city hired a 3rd at 3 cities, live t88)
 local WANT_MILITARY_PER_CITY = 2   -- garrison + a responder
 local MAX_SETTLERS_IN_FLIGHT = 1   -- Anthony's standard (#21): found the current
                                    -- city before training the next settler
@@ -2820,7 +2942,7 @@ local function CompositionWant(emp)
 	-- require the shortage to PERSIST two consecutive turns -- captured
 	-- builders were triggering same-turn re-hires straight back into the same
 	-- death trap (5 builder IDs in one Norway session).
-	if emp.builders < emp.cities * WANT_BUILDERS_PER_CITY
+	if emp.builders < WANT_BUILDERS_TOTAL
 	   and not g_builderIdleLastTurn and not g_builderIdleThisTurn then
 		-- Count the shortage once per TURN, not once per call: this runs per
 		-- city per pass, so the old counter hit "2 consecutive turns" within a
@@ -3029,6 +3151,67 @@ local function AutomateProduction(pPlayer, threats)
 							(kType ~= nil and kType.Type) or tostring(best.hash),
 							dCity, nDefenders);
 					end
+				end
+			end
+
+			-- REPAIR pillaged districts/buildings before anything non-defensive
+			-- (Anthony live t88: "Holy Site (Repair)" is a CITY-PRODUCTION item,
+			-- builders cannot touch districts). A pillaged district also makes
+			-- the engine silently DROP orders for its buildings -- we queued
+			-- Shrine/Temple into a pillaged Holy Site and the city stuck on
+			-- "Nothing" with the chooser popup up. Repair = plain BUILD with the
+			-- hash, no plot (ProductionPanel.lua:400-403; pillage flags :1996
+			-- districts-by-Index, :2075 buildings-by-Hash).
+			if not g_cityOrdered[cityID] then
+				local okD, cityDistricts = pcall(function() return pCity:GetDistricts(); end);
+				if okD and cityDistricts ~= nil then
+					for dRow in GameInfo.Districts() do
+						local okP, pill = pcall(function() return cityDistricts:IsPillaged(dRow.Index); end);
+						if okP and pill == true then
+							local tP = {};
+							tP[CityOperationTypes.PARAM_DISTRICT_TYPE] = dRow.Hash;
+							tP[CityOperationTypes.PARAM_INSERT_MODE]   = CityOperationTypes.VALUE_EXCLUSIVE;
+							CityManager.RequestOperation(pCity, CityOperationTypes.BUILD, tP);
+							g_cityOrdered[cityID] = true;
+							Log("produce [%s]: REPAIRING pillaged %s", tostring(pCity:GetName()), tostring(dRow.DistrictType));
+							break;
+						end
+					end
+				end
+				if not g_cityOrdered[cityID] then
+					local okB, cityBuildings = pcall(function() return pCity:GetBuildings(); end);
+					if okB and cityBuildings ~= nil then
+						for bRow in GameInfo.Buildings() do
+							local okP, pill = pcall(function() return cityBuildings:IsPillaged(bRow.Hash); end);
+							if okP and pill == true then
+								local tP = {};
+								tP[CityOperationTypes.PARAM_BUILDING_TYPE] = bRow.Hash;
+								tP[CityOperationTypes.PARAM_INSERT_MODE]   = CityOperationTypes.VALUE_EXCLUSIVE;
+								CityManager.RequestOperation(pCity, CityOperationTypes.BUILD, tP);
+								g_cityOrdered[cityID] = true;
+								Log("produce [%s]: REPAIRING pillaged %s", tostring(pCity:GetName()), tostring(bRow.BuildingType));
+								break;
+							end
+						end
+					end
+				end
+			end
+
+			-- GREAT-WORK SLOT NUDGE (#27, live: Machiavelli claimed with nowhere
+			-- to put his writing): a GP flagged as slot-starved queues the
+			-- cheapest slot building here (Amphitheater for writers). The
+			-- build's completion wakes the sleeping GP automatically.
+			if not g_cityOrdered[cityID] and g_gpNeedSlot ~= nil then
+				local wish = FindSlotBuildingWish(g_gpNeedSlot);
+				if wish ~= nil and CanCityProduce(wish.Hash) then
+					local tW = {};
+					tW[CityOperationTypes.PARAM_BUILDING_TYPE] = wish.Hash;
+					tW[CityOperationTypes.PARAM_INSERT_MODE]   = CityOperationTypes.VALUE_EXCLUSIVE;
+					CityManager.RequestOperation(pCity, CityOperationTypes.BUILD, tW);
+					g_cityOrdered[cityID] = true;
+					Log("produce [%s]: great person waiting for a %s slot -> %s",
+						tostring(pCity:GetName()), tostring(g_gpNeedSlot), tostring(wish.BuildingType));
+					g_gpNeedSlot = nil;
 				end
 			end
 

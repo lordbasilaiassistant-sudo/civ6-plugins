@@ -3227,6 +3227,29 @@ local function AutomateProduction(pPlayer, threats)
 				end
 			end
 
+			-- WALLS while threatened (live t177: Ancient Walls 7t sat unpicked
+			-- while Tlacopan was besieged -- the override only knew units).
+			-- Walls = the free city ranged strike every turn (#29), the best
+			-- defensive build there is. Implicit test: any building with outer
+			-- defense HP, cheapest first, strict-producible -- no name list.
+			if not g_cityOrdered[cityID] and dCity ~= nil and dCity <= 4 and nDefenders >= 2 then
+				local wall = nil;
+				for wRow in GameInfo.Buildings() do
+					if (wRow.OuterDefenseHitPoints or 0) > 0 and CanCityProduce(wRow.Hash) then
+						if wall == nil or (wRow.Cost or 9999) < (wall.Cost or 9999) then wall = wRow end
+					end
+				end
+				if wall ~= nil then
+					local tW = {};
+					tW[CityOperationTypes.PARAM_BUILDING_TYPE] = wall.Hash;
+					tW[CityOperationTypes.PARAM_INSERT_MODE]   = CityOperationTypes.VALUE_EXCLUSIVE;
+					CityManager.RequestOperation(pCity, CityOperationTypes.BUILD, tW);
+					g_cityOrdered[cityID] = true;
+					Log("defense [%s]: WALLS -> %s (enemy %d out)",
+						tostring(pCity:GetName()), tostring(wall.BuildingType), dCity);
+				end
+			end
+
 			-- REPAIR pillaged districts/buildings before anything non-defensive
 			-- (Anthony live t88: "Holy Site (Repair)" is a CITY-PRODUCTION item,
 			-- builders cannot touch districts). A pillaged district also makes

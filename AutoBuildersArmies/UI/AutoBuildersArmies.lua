@@ -77,6 +77,15 @@ local g_plotSkip    = {}    -- [plotIndex]=expiry turn. A plot where a builder s
                             -- and found NOTHING legal to build (tech not in yet --
                             -- issue #9) is excluded from the scan for a few turns so
                             -- the builder moves on instead of re-picking it forever.
+local g_defcity     = nil   -- {x,y,name,dist} set each pass: the own city with an
+                            -- enemy within CITY_DEFENSE_RADIUS (nil = all safe).
+                            -- Read by the combat brain (defense mode) and by
+                            -- CompositionVetoes (no settlers while under attack).
+local g_rallyStuck  = {}    -- [unitID]={x,y,n,holdUntil}: rally attempts issued from
+                            -- an unchanged position. 3 strikes -> the rally target is
+                            -- unreachable from here (#24: warrior skipped 23 turns);
+                            -- hold in place ~10 turns before trying again. Survives
+                            -- across turns on purpose.
 local g_refused     = {}    -- [unitID]=count of consecutive all-ops-refused passes.
                             -- Newly trained units refuse everything for one event
                             -- beat then accept (issue #10) -- only the SECOND
@@ -165,6 +174,16 @@ local COL_WARN = 0xFF3BA9FF
 
 local HEAL_HP_THRESHOLD = 60   -- heal when below this HP%
 local MELEE_STR_MARGIN  = 3    -- attack if our strength >= enemy strength - this
+
+-- City-defense doctrine (Anthony, 2026-07-17: "gotta defend cities first and
+-- foremost"). An enemy near an own city flips every nearby soldier into
+-- defense mode: cohesion rallies and settler escorts are suspended, near-even
+-- fights are accepted (the city's ranged strike + our fortify bonus tip them),
+-- and everyone not in contact converges on the city instead of the muster.
+local CITY_DEFENSE_RADIUS = 3  -- enemy this close to an own city = city threatened
+local CITY_DEFENDER_PULL  = 8  -- soldiers this close to the threatened city defend it
+local DEFENSE_STR_MARGIN  = 10 -- extra melee margin while defending (accept near-even)
+local BUILDER_FLEE_DIST   = 2  -- builders run home at this threat range (they die in place otherwise)
 local MELEE_WOUNDED_HP  = 40   -- ...or if the enemy is at/below this HP%
 
 -- ---------------------------------------------------------------- helpers ---
@@ -830,9 +849,23 @@ end
 
 -- Returns "repair" | "build" | "move" | "skip", or nil if NOTHING was issued
 -- (nil is the caller's signal to run the catch-all).
-local function AutomateBuilder(pUnit, pPlayer)
+local function AutomateBuilder(pUnit, pPlayer, threats)
 	local x, y = pUnit:GetX(), pUnit:GetY();
 	local plot = Map.GetPlot(x, y);
+
+	-- 0) Survival first (#25, live: builder 851972 sat 9 turns with an enemy
+	--    one tile away and died in place). Scouts retreat, settlers flee home --
+	--    builders now do too.
+	local dT = NearestThreatDist(threats, x, y, true);
+	if dT ~= nil and dT <= BUILDER_FLEE_DIST then
+		local home = NearestOwnCityPlot(pPlayer, x, y);
+		if home ~= nil and not (home:GetX() == x and home:GetY() == y) then
+			if MoveTo(pUnit, home:GetX(), home:GetY()) then
+				Log("builder %d: enemy %d tiles away, fleeing home", pUnit:GetID(), dT);
+				return "flee";
+			end
+		end
+	end
 
 	-- 1) Repair a pillaged improvement/road under the builder first.
 	if plot ~= nil and (plot:IsImprovementPillaged() or plot:IsRoutePillaged()) then
@@ -1319,7 +1352,7 @@ local function BestRangedTarget(pUnit, eLocalPlayer, pDiplo, pVis)
 	return best;
 end
 
-local function BestMeleeTarget(pUnit, eLocalPlayer, pDiplo, pVis, myStr)
+local function BestMeleeTarget(pUnit, eLocalPlayer, pDiplo, pVis, myStr, extraMargin)
 	local ok, reach = pcall(function() return UnitManager.GetReachableTargets(pUnit); end);
 	if not ok or reach == nil then return nil end
 	local best, bestScore = nil, -1;
@@ -1329,7 +1362,7 @@ local function BestMeleeTarget(pUnit, eLocalPlayer, pDiplo, pVis, myStr)
 		if e ~= nil then
 			local eStr = math.max(e:GetCombat(), e:GetRangedCombat());
 			local eHp  = HPPercent(e);
-			if (myStr >= eStr - MELEE_STR_MARGIN) or (eHp <= MELEE_WOUNDED_HP) then
+			if (myStr >= eStr - MELEE_STR_MARGIN - (extraMargin or 0)) or (eHp <= MELEE_WOUNDED_HP) then
 				local score = (myStr - eStr) + (100 - eHp);
 				-- Focus fire (issue #6): kill-shots first, always.
 				if eHp <= 35 then score = score + 200 end
@@ -1438,6 +1471,13 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	local myStr  = math.max(pUnit:GetCombat(), pUnit:GetRangedCombat());
 	local ranged = IsRanged(pUnit);
 
+	-- CITY DEFENSE MODE (#25, Anthony's doctrine): a soldier near a threatened
+	-- own city is a defender before it is anything else -- no rallying away, no
+	-- escort detours, and near-even fights are taken (fortify + city strike tip
+	-- them our way). Scouts never get here (recon branch), so this is soldiers only.
+	local defending = (g_defcity ~= nil
+		and Map.GetPlotDistance(x, y, g_defcity.x, g_defcity.y) <= CITY_DEFENDER_PULL);
+
 	-- A) Attack. Ranged fires from safety; melee only hits weaker/wounded foes.
 	-- Only if the unit actually has an attack left: the base game gates its own
 	-- target display on this (SelectedUnit.lua:62), and without it a spent unit
@@ -1459,7 +1499,8 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 				end
 			end
 		else
-			local target = BestMeleeTarget(pUnit, eLocalPlayer, pDiplo, pVis, myStr);
+			local target = BestMeleeTarget(pUnit, eLocalPlayer, pDiplo, pVis, myStr,
+				defending and DEFENSE_STR_MARGIN or 0);
 			if target ~= nil then
 				local tParams = {
 					[UnitOperationTypes.PARAM_X] = target:GetX(),
@@ -1492,9 +1533,10 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	-- B2) ESCORT (issue #19, Anthony's direction): a settler without a shadow
 	-- is a barbarian gift. If an own settler is nearby and no other army
 	-- member is closer, shadow it -- this outranks advancing on enemies.
+	-- Suspended in defense mode: cities first and foremost (#25).
 	local pP = Players[eLocalPlayer];
 	local okS, units = pcall(function() return pP:GetUnits(); end);
-	if okS and units ~= nil then
+	if okS and units ~= nil and not defending then
 		for _, u in units:Members() do
 			if not u:IsDead() and IsSettler(u) then
 				local dMe = Map.GetPlotDistance(x, y, u:GetX(), u:GetY());
@@ -1526,7 +1568,7 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 	--     Everything BELOW is marching on an objective, and marching is a group
 	--     action. A lone unit walks to the rally point and waits for the others
 	--     rather than arriving by itself and dying by itself.
-	if army ~= nil and #army > 0 and not IsCohesive(army, x, y) then
+	if army ~= nil and #army > 0 and not defending and not IsCohesive(army, x, y) then
 		-- Never rally AWAY from an enemy that is already on top of us. The wake
 		-- branch exists precisely to make lone garrisons defend; sending them
 		-- marching to the army's centre of mass would un-fix that bug. Contact
@@ -1550,9 +1592,23 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 		end
 		local rally = ArmyRally(army);
 		if rally ~= nil and rally.id ~= pUnit:GetID() then
-			if MoveTo(pUnit, rally.x, rally.y) then
+			-- #24: the engine can ACCEPT a rally MOVE_TO and then refuse the path
+			-- (warrior 393220 re-issued the same rally 23 turns straight). Rally
+			-- attempts from an UNCHANGED position get 3 tries, then this unit
+			-- holds ~10 turns before asking again.
+			local id, turn = pUnit:GetID(), Game.GetCurrentGameTurn();
+			local st = g_rallyStuck[id];
+			if st ~= nil and (st.x ~= x or st.y ~= y) then st = nil; g_rallyStuck[id] = nil end
+			if st ~= nil and st.n >= 3 and turn < st.holdUntil then
+				Log("unit %d: rally unreachable from %d,%d (3 strikes) -> holding until t%d",
+					id, x, y, st.holdUntil);
+				-- fall through to fortify/muster below
+			elseif MoveTo(pUnit, rally.x, rally.y) then
+				if st == nil then st = { x = x, y = y, n = 0, holdUntil = 0 }; g_rallyStuck[id] = st end
+				st.n = st.n + 1;
+				if st.n >= 3 then st.holdUntil = turn + 10 end
 				Log("unit %d: alone (%d near) -> rallying to %d,%d",
-					pUnit:GetID(), GroupSizeNear(army, x, y), rally.x, rally.y);
+					id, GroupSizeNear(army, x, y), rally.x, rally.y);
 				return "rally";
 			end
 		end
@@ -1563,6 +1619,38 @@ local function AutomateCombatUnit(pUnit, eLocalPlayer, pDiplo, pVis, threats, ar
 			return "muster";
 		end
 		return nil;
+	end
+
+	-- C2) DEFENSE CONVERGE (#25). In defense mode with nothing in attack reach:
+	--     close on the threatened city and hold the ring there. This replaces
+	--     the rally/advance behaviour entirely while a city is under threat.
+	if defending then
+		local dCity = Map.GetPlotDistance(x, y, g_defcity.x, g_defcity.y);
+		if dCity > 1 then
+			if MoveTo(pUnit, g_defcity.x, g_defcity.y) then
+				Log("unit %d: DEFENDING %s -> converging (%d tiles out)",
+					pUnit:GetID(), tostring(g_defcity.name), dCity);
+				return "defend";
+			end
+		end
+		-- At the city or pathless: hold. SKIP first when in contact (fortify is
+		-- a revolving door next to enemies -- the cohesion-gate lesson), fortify
+		-- otherwise for the defense bonus.
+		local dHere = NearestThreatDist(threats, x, y);
+		if dHere ~= nil and dHere <= 1 then
+			if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+				IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+				return "garrison";
+			end
+		end
+		if CanStart(pUnit, UnitOperationTypes.FORTIFY) then
+			IssueOp(pUnit, UnitOperationTypes.FORTIFY);
+			return "garrison";
+		end
+		if CanStart(pUnit, UnitOperationTypes.SKIP_TURN) then
+			IssueOp(pUnit, UnitOperationTypes.SKIP_TURN);
+			return "garrison";
+		end
 	end
 
 	-- D) An explicit ATTACK order overrides everything: march on THAT city.
@@ -1992,7 +2080,7 @@ local SETTLER_CITY_CAP       = 6   -- stop expanding around here; deepen instead
 -- same turn and all four queue a builder. (Same failure mode as the
 -- g_cityOrdered debounce, one level up.)
 local function CountEmpire(pPlayer)
-	local c = { cities = 0, builders = 0, settlers = 0, military = 0 };
+	local c = { cities = 0, builders = 0, settlers = 0, military = 0, militaryAlive = 0 };
 
 	local okC, cities = pcall(function() return pPlayer:GetCities(); end);
 	if okC and cities ~= nil then
@@ -2021,7 +2109,10 @@ local function CountEmpire(pPlayer)
 			if not u:IsDead() then
 				if IsBuilder(u) then c.builders = c.builders + 1;
 				elseif IsSettler(u) then c.settlers = c.settlers + 1;
-				elseif IsCombatUnit(u) and not IsRecon(u) then c.military = c.military + 1 end
+				elseif IsCombatUnit(u) and not IsRecon(u) then
+					c.military = c.military + 1;
+					c.militaryAlive = c.militaryAlive + 1;
+				end
 			end
 		end
 	end
@@ -2063,8 +2154,11 @@ local function CompositionVetoes(h, emp)
 		-- plenty, and past the city cap we should be deepening, not sprawling.
 		if emp.settlers >= MAX_SETTLERS_IN_FLIGHT then return true, "settler cap" end
 		if emp.cities   >= SETTLER_CITY_CAP       then return true, "city cap" end
-		-- Expansion standard (#21): no settling without escort coverage.
-		if emp.military < emp.cities + 1 then return true, "need army first" end
+		-- Anthony's doctrine (#25): "a settler is pointless without enough to
+		-- defend current cities + enough to escort. Cities first and foremost."
+		-- ALIVE soldiers only -- one queued warrior is not a garrison.
+		if g_defcity ~= nil then return true, "city under threat -- defense first" end
+		if (emp.militaryAlive or 0) < emp.cities + 1 then return true, "defend cities first" end
 	end
 	return false;
 end
@@ -2185,6 +2279,28 @@ local function AutomateProduction(pPlayer, threats)
 					Log("defense [%s]: enemy %d tiles out -> %s",
 						tostring(pCity:GetName()), dCity,
 						(kType ~= nil and kType.Type) or tostring(best.hash));
+
+					-- GOLD IS A TOOL (Anthony, 2026-07-17): production takes turns
+					-- a threatened city may not have. If the treasury covers the
+					-- same defender, BUY it outright -- it spawns this turn.
+					-- API verified in the install: ProductionPanel.lua:423-435
+					-- (PARAM_UNIT_TYPE + PARAM_MILITARY_FORMATION_TYPE +
+					-- PARAM_YIELD_TYPE=YIELD_GOLD index -> RequestCommand PURCHASE),
+					-- gate form :1639-1640 (CanStartCommand 5-arg).
+					local tBuy = {};
+					tBuy[CityCommandTypes.PARAM_UNIT_TYPE] = best.hash;
+					tBuy[CityCommandTypes.PARAM_MILITARY_FORMATION_TYPE] = MilitaryFormationTypes.STANDARD_MILITARY_FORMATION;
+					tBuy[CityCommandTypes.PARAM_YIELD_TYPE] = GameInfo.Yields["YIELD_GOLD"].Index;
+					local okB, canBuy = pcall(function()
+						return CityManager.CanStartCommand(pCity, CityCommandTypes.PURCHASE, false, tBuy, false);
+					end);
+					if okB and canBuy == true then
+						CityManager.RequestCommand(pCity, CityCommandTypes.PURCHASE, tBuy);
+						Log("defense [%s]: GOLD-BOUGHT %s (enemy %d out, %d defenders)",
+							tostring(pCity:GetName()),
+							(kType ~= nil and kType.Type) or tostring(best.hash),
+							dCity, nDefenders);
+					end
 				end
 			end
 
@@ -2462,6 +2578,28 @@ local function RunAutomation()
 
 	local threats = BuildThreatCache(eLocalPlayer, pDiplo, pVis);
 
+	-- Threatened-city scan (#25): the own city closest to an enemy within
+	-- CITY_DEFENSE_RADIUS. Non-nil flips nearby soldiers into defense mode and
+	-- vetoes settler production for the duration.
+	g_defcity = nil;
+	if threats ~= nil and #threats > 0 then
+		local okDC, cities = pcall(function() return pPlayer:GetCities(); end);
+		if okDC and cities ~= nil then
+			for _, pCity in cities:Members() do
+				local d = NearestThreatDist(threats, pCity:GetX(), pCity:GetY());
+				if d ~= nil and d <= CITY_DEFENSE_RADIUS
+				   and (g_defcity == nil or d < g_defcity.dist) then
+					g_defcity = { x = pCity:GetX(), y = pCity:GetY(),
+					              name = pCity:GetName(), dist = d };
+				end
+			end
+		end
+		if g_defcity ~= nil then
+			Log("CITY UNDER THREAT: %s (enemy %d out) -- defense mode on",
+				tostring(g_defcity.name), g_defcity.dist);
+		end
+	end
+
 	-- One army snapshot per pass, taken BEFORE anything moves: every unit must
 	-- judge cohesion against the same picture, or the first unit to move shifts
 	-- the rally point under the feet of the next one and they chase each other.
@@ -2505,7 +2643,7 @@ local function RunAutomation()
 
 				if g_builders and isBuilder then
 					kind = "builder";
-					r = AutomateBuilder(pUnit, pPlayer);
+					r = AutomateBuilder(pUnit, pPlayer, threats);
 					Log("builder %d -> %s", id, tostring(r));
 					if r == "build" or r == "repair" or r == "move" then nB = nB + 1 end
 					-- Unemployment signal for composition (issue #5): charges but
